@@ -134,37 +134,40 @@ def getSignals(rates_frame,strTimeframe):
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
-    previousBuyCondition = (candleClose_L1  >  tenkanSen_L1    and
-                            tenkanSen_L1    >  kijunSen_L1     and
-                            kijunSen_L1     >  senkouSpanA_L1  and
-                            senkouSpanA_L1  >  senkouSpanB_L1  and
-                            chikouSpan_L27  >  tenkanSen_L27   and
-                            chikouSpan_L27  >  kijunSen_L27    and
-                            chikouSpan_L27  >  senkouSpanA_L27 and
-                            chikouSpan_L27  >  senkouSpanB_L27 and
-                            chikouSpan_L27  >  candleOpen_L27  and
-                            chikouSpan_L27  >  candleClose_L27 and
-                            (chikouSpan_L27 >  rates_frame["open"].iloc[-27:-3]).all()  and
-                            (chikouSpan_L27 >  rates_frame["close"].iloc[-27:-3]).all() and
+    previousBuyCondition =  (candleClose_L1   >  tenkanSen_L1    and
+                            tenkanSen_L1     >  kijunSen_L1     and
+                            kijunSen_L1      >  senkouSpanA_L1  and
+                            senkouSpanA_L1   >  senkouSpanB_L1  and
+                            
+                            chikouSpan_L27   >  tenkanSen_L27   and
+                            chikouSpan_L27   >  kijunSen_L27    and
+                            chikouSpan_L27   >  senkouSpanA_L27 and
+                            chikouSpan_L27   >  senkouSpanB_L27 and
+                            chikouSpan_L27   >  candleOpen_L27  and
+                            chikouSpan_L27   >  candleClose_L27 and
+                            (chikouSpan_L27  >  rates_frame["open"].iloc[-27:-3]).all()  and
+                            (chikouSpan_L27  >  rates_frame["close"].iloc[-27:-3]).all() and
+                            
                             (FutureSenkouSpanA_B > 1).all())
-                            
-                            
-
     
-    currentBuyCondition =  (candleClose_0   > tenkanSen_0      and
-                            tenkanSen_0     > kijunSen_0       and
-                            kijunSen_0      > senkouSpanA_0    and
-                            senkouSpanA_0   > senkouSpanB_0    and
+    
+    currentBuyCondition  =  (candleClose_0    > tenkanSen_0      and
+                            tenkanSen_0      > kijunSen_0       and
+                            kijunSen_0       > senkouSpanA_0    and
+                            senkouSpanA_0    > senkouSpanB_0    and
                             
-                            chikouSpan_L26  > tenkanSen_L26    and
-                            chikouSpan_L26  > kijunSen_L26     and
-                            chikouSpan_L26  > senkouSpanA_L26  and
-                            chikouSpan_L26  > senkouSpanB_L26  and
-                            chikouSpan_L26  > candleOpen_L26   and
-                            chikouSpan_L26  > candleClose_L26  and
-                            (chikouSpan_L26 >  rates_frame["open"].iloc[-26:-2]).all()  and
-                            (chikouSpan_L26 >  rates_frame["close"].iloc[-26:-2]).all() and
+                            chikouSpan_L26   > tenkanSen_L26    and
+                            chikouSpan_L26   > kijunSen_L26     and
+                            chikouSpan_L26   > senkouSpanA_L26  and
+                            chikouSpan_L26   > senkouSpanB_L26  and
+                            chikouSpan_L26   > candleOpen_L26   and
+                            chikouSpan_L26   > candleClose_L26  and
+                            (chikouSpan_L26  >  rates_frame["open"].iloc[-26:-2]).all()  and
+                            (chikouSpan_L26  >  rates_frame["close"].iloc[-26:-2]).all() and
+                            
                             (FutureSenkouSpanA_B > 1).all())
+    
+    #reversalBuyCondition = 
                             
     
     if(previousBuyCondition == True  and currentBuyCondition == True):
@@ -178,7 +181,7 @@ def getSignals(rates_frame,strTimeframe):
     # SELL SIGNAL
     #####################################################################################################
 
-    previousSellCondition = (candleClose_L1  <  tenkanSen_L1    and
+    previousSellCondition  = (candleClose_L1  <  tenkanSen_L1    and
                              tenkanSen_L1    <  kijunSen_L1     and
                              kijunSen_L1     <  senkouSpanA_L1  and
                              senkouSpanA_L1  <  senkouSpanB_L1  and
@@ -192,9 +195,9 @@ def getSignals(rates_frame,strTimeframe):
                              (chikouSpan_L27 <  rates_frame["open"].iloc[-27:-3]).all()  and
                              (chikouSpan_L27 <  rates_frame["close"].iloc[-27:-3]).all() and
                              (FutureSenkouSpanA_B < 1).all())
-                             
     
-    currentSellCondition = (candleClose_0    < tenkanSen_0      and
+    
+    currentSellCondition  = (candleClose_0    < tenkanSen_0      and
                             tenkanSen_0      < kijunSen_0       and
                             kijunSen_0       < senkouSpanA_0    and
                             senkouSpanA_0    < senkouSpanB_0    and
@@ -207,7 +210,11 @@ def getSignals(rates_frame,strTimeframe):
                             chikouSpan_L26   < candleClose_L26  and
                             (chikouSpan_L26  < rates_frame["open"].iloc[-26:-2]).all()  and
                             (chikouSpan_L26  < rates_frame["close"].iloc[-26:-2]).all() and
+                            
                             (FutureSenkouSpanA_B < 1).all())
+    
+    
+    #reversalSellCondition = 
     
     if(previousSellCondition == True  and currentSellCondition == True):
         Signals.append("[SELL " + strTimeframe + "]")
