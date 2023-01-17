@@ -148,7 +148,7 @@ def getSignals(rates_frame,strTimeframe):
                             (chikouSpan_L27  >  rates_frame["open"].iloc[-27:-3]).all()  and
                             (chikouSpan_L27  >  rates_frame["close"].iloc[-27:-3]).all() and
                             
-                            (FutureSenkouSpanA_B > 1).all())
+                            (FutureSenkouSpanA_B > 0)).all()
     
     
     currentBuyCondition  =  (candleClose_0   > tenkanSen_0      and
@@ -165,11 +165,9 @@ def getSignals(rates_frame,strTimeframe):
                             (chikouSpan_L26  >  rates_frame["open"].iloc[-26:-2]).all()  and
                             (chikouSpan_L26  >  rates_frame["close"].iloc[-26:-2]).all() and
                             
-                            (FutureSenkouSpanA_B > 1).all())
+                            (FutureSenkouSpanA_B > 0)).all()
     
-    reversalBuyCondition =  (senkouSpanA_0   <  senkouSpanB_0   and
-                             kijunSen_0      <= senkouSpanA_R26 and
-                            (FutureSenkouSpanA_B < 1).all())
+    reversalBuyCondition =  (FutureSenkouSpanA_B < 0).all()
                             
     
     if(previousBuyCondition == True  and currentBuyCondition == True):
@@ -178,8 +176,8 @@ def getSignals(rates_frame,strTimeframe):
     if(previousBuyCondition == False and currentBuyCondition == True):
         Signals.append("[BUY " + strTimeframe + " NOW]")
         
-    if(reversalBuyCondition):
-        Signals.append("[BUY " + strTimeframe + "*]")
+    #if(reversalBuyCondition):
+    #    Signals.append("[BUY " + strTimeframe + "*]")
         
         
     
@@ -200,7 +198,8 @@ def getSignals(rates_frame,strTimeframe):
                              chikouSpan_L27  <  candleClose_L27 and
                              (chikouSpan_L27 <  rates_frame["open"].iloc[-27:-3]).all()  and
                              (chikouSpan_L27 <  rates_frame["close"].iloc[-27:-3]).all() and
-                             (FutureSenkouSpanA_B < 1).all())
+                              
+                             (FutureSenkouSpanA_B < 0)).all()
     
     
     currentSellCondition  = (candleClose_0   < tenkanSen_0      and
@@ -217,12 +216,10 @@ def getSignals(rates_frame,strTimeframe):
                             (chikouSpan_L26  < rates_frame["open"].iloc[-26:-2]).all()  and
                             (chikouSpan_L26  < rates_frame["close"].iloc[-26:-2]).all() and
                             
-                            (FutureSenkouSpanA_B < 1).all())
+                            (FutureSenkouSpanA_B < 0)).all()
     
     
-    reversalSellCondition = (senkouSpanA_0   >  senkouSpanB_0   and
-                             kijunSen_0      >= senkouSpanA_R26 and
-                            (FutureSenkouSpanA_B > 1).all())
+    reversalSellCondition = (FutureSenkouSpanA_B > 0).all()
     
     if(previousSellCondition == True  and currentSellCondition == True):
         Signals.append("[SELL " + strTimeframe + "]")
@@ -230,8 +227,8 @@ def getSignals(rates_frame,strTimeframe):
     if(previousSellCondition == False and currentSellCondition == True):
         Signals.append("[SELL " + strTimeframe + " NOW]")
         
-    if(reversalSellCondition):
-        Signals.append("[SELL " + strTimeframe + "*]")
+    #if(reversalSellCondition):
+    #    Signals.append("[SELL " + strTimeframe + "*]")
         
     
 ##########################################################################################
