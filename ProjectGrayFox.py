@@ -85,7 +85,9 @@ Signals   = []
 def getSignals(rates_frame,strTimeframe):
     
     ichimokuValues                           = ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    FutureSenkouSpanA_B                      = ichimokuValues[1]["ISA_9"] - ichimokuValues[1]["ISB_26"]
+    FutureSenkouSpanA                        = ichimokuValues[1]["ISA_9"]
+    FutureSenkouSpanB                        = ichimokuValues[1]["ISB_26"]
+    FutureSenkouSpanA_B                      = FutureSenkouSpanA - FutureSenkouSpanB
 
 
     #####################################################################################################
@@ -169,7 +171,8 @@ def getSignals(rates_frame,strTimeframe):
                             
                             (FutureSenkouSpanA_B > 0)).all()
     
-    reversalBuyCondition =  (FutureSenkouSpanA_B < 0).all()
+    reversalBuyCondition =  ((FutureSenkouSpanA_B < 0).all() and
+                            (kijunSen_0 <= FutureSenkouSpanA).all())
                             
     
     if(previousBuyCondition == True  and currentBuyCondition == True):
@@ -178,8 +181,8 @@ def getSignals(rates_frame,strTimeframe):
     if(previousBuyCondition == False and currentBuyCondition == True):
         Signals.append("[BUY " + strTimeframe + " NOW]")
         
-    #if(reversalBuyCondition):
-    #    Signals.append("[BUY " + strTimeframe + "*]")
+    if(reversalBuyCondition):
+        Signals.append("[BUY " + strTimeframe + "*]")
         
         
     
@@ -223,7 +226,8 @@ def getSignals(rates_frame,strTimeframe):
                             (FutureSenkouSpanA_B < 0)).all()
     
     
-    reversalSellCondition = (FutureSenkouSpanA_B > 0).all()
+    reversalSellCondition = ((FutureSenkouSpanA_B > 0).all() and
+                            (kijunSen_0 >= FutureSenkouSpanA).all())
     
     if(previousSellCondition == True  and currentSellCondition == True):
         Signals.append("[SELL " + strTimeframe + "]")
@@ -231,8 +235,8 @@ def getSignals(rates_frame,strTimeframe):
     if(previousSellCondition == False and currentSellCondition == True):
         Signals.append("[SELL " + strTimeframe + " NOW]")
         
-    #if(reversalSellCondition):
-    #    Signals.append("[SELL " + strTimeframe + "*]")
+    if(reversalSellCondition):
+        Signals.append("[SELL " + strTimeframe + "*]")
         
     
 ##########################################################################################
