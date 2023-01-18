@@ -96,14 +96,14 @@ def getSignals(rates_frame,strTimeframe):
     # BUY SIGNAL
     #####################################################################################################
     
-    if((FutureSenkouSpanA_B < 0).all() and (kijunSen_0 <= FutureSenkouSpanA).all()):
+    if((FutureSenkouSpanA_B < 0).all() and (kijunSen_0 < FutureSenkouSpanA).all()):
         Signals.append("[BUY " + strTimeframe + " NOW]")
         
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
-    if((FutureSenkouSpanA_B > 0).all() and (kijunSen_0 >= FutureSenkouSpanA).all()):
+    if((FutureSenkouSpanA_B > 0).all() and (kijunSen_0 > FutureSenkouSpanA).all()):
         Signals.append("[SELL " + strTimeframe + " NOW]")
         
     
