@@ -91,6 +91,9 @@ def getSignals(rates_frame,strTimeframe):
     
     tenkanSen_0                              = ichimokuValues[0]["ITS_9"].iloc[-1]      
     kijunSen_0                               = ichimokuValues[0]["IKS_26"].iloc[-1]  
+    senkouSpanA_0                            = ichimokuValues[0]["ISA_9"].iloc[-1]      
+    senkouSpanB_0                            = ichimokuValues[0]["ISB_26"].iloc[-1]
+    candleClose_0                            = rates_frame["close"].iloc[-1]
     
     #####################################################################################################
     # FUTURE STATE
@@ -119,7 +122,8 @@ def getSignals(rates_frame,strTimeframe):
     if(sameLastFiveSenkouSpanB):
         if(leftSenkouSpanA < leftSenkouSpanB and rightSenkouSpanA> rightSenkouSpanB):
             if( tenkanSen_0 > kijunSen_0  and True):
-                Signals.append("[BUY " + strTimeframe + "]")
+                if(candleClose_0 > senkouSpanA_0 and candleClose_0 > senkouSpanB_0):
+                    Signals.append("[BUY " + strTimeframe + "]")
                                
     #####################################################################################################
     # SELL SIGNAL
@@ -128,7 +132,8 @@ def getSignals(rates_frame,strTimeframe):
     if(sameLastFiveSenkouSpanB):
         if(leftSenkouSpanA > leftSenkouSpanB and rightSenkouSpanA < rightSenkouSpanB):
             if( tenkanSen_0 < kijunSen_0  and True):
-                Signals.append("[SELL " + strTimeframe + "]")
+                if(candleClose_0 < senkouSpanA_0 and candleClose_0 < senkouSpanB_0):
+                    Signals.append("[SELL " + strTimeframe + "]")
 
 ##########################################################################################
 
