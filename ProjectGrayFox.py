@@ -75,7 +75,6 @@ numCandles     = 200
 offset         = 1
 
 Signals   = []
-
 ##########################################################################################
 
 
@@ -85,28 +84,52 @@ Signals   = []
 def getSignals(rates_frame,strTimeframe):
     
     ichimokuValues                           = ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    FutureSenkouSpanA                        = ichimokuValues[1]["ISA_9"]
-    FutureSenkouSpanB                        = ichimokuValues[1]["ISB_26"]
-    FutureSenkouSpanA_B                      = FutureSenkouSpanA - FutureSenkouSpanB
-    kijunSen_0                               = ichimokuValues[0]["IKS_26"].iloc[-1]     
 
-
+    #####################################################################################################
+    # CURRENT STATE
+    #####################################################################################################
+    
+    tenkanSen_0                              = ichimokuValues[0]["ITS_9"].iloc[-1]      
+    kijunSen_0                               = ichimokuValues[0]["IKS_26"].iloc[-1]  
+    
+    #####################################################################################################
+    # FUTURE STATE
+    #####################################################################################################
+    
+    lastFiveSenkouSpanA                      = list(ichimokuValues[1]["ISA_9"].tail(5))
+    lastFiveSenkouSpanB                      = list(ichimokuValues[1]["ISB_26"].tail(5))
+    
+    #####################################################################################################
+    # CONDITIONS
+    #####################################################################################################
+    
+    leftSenkouSpanA                          = lastFiveSenkouSpanA[0]
+    rightSenkouSpanA                         = lastFiveSenkouSpanA[-1]
+    
+    leftSenkouSpanB                          = lastFiveSenkouSpanB[0]
+    rightSenkouSpanB                         = lastFiveSenkouSpanB[-1]
+    
+    sameLastFiveSenkouSpanB                  = (all(x == lastFiveSenkouSpanB[0] for x in lastFiveSenkouSpanB))
+    
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if((FutureSenkouSpanA_B < 0).all() and (kijunSen_0 < FutureSenkouSpanA).all()):
-        Signals.append("[BUY " + strTimeframe + " NOW]")
-        
+    if(sameLastFiveSenkouSpanB):
+        if(leftSenkouSpanA < leftSenkouSpanB and rightSenkouSpanA> rightSenkouSpanB):
+            if( tenkanSen_0 > kijunSen_0  and True):
+                Signals.append("[BUY " + strTimeframe + "]")
+                               
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
-    if((FutureSenkouSpanA_B > 0).all() and (kijunSen_0 > FutureSenkouSpanA).all()):
-        Signals.append("[SELL " + strTimeframe + " NOW]")
-        
-    
+    if(sameLastFiveSenkouSpanB):
+        if(leftSenkouSpanA > leftSenkouSpanB and rightSenkouSpanA < rightSenkouSpanB):
+            if( tenkanSen_0 < kijunSen_0  and True):
+                Signals.append("[SELL " + strTimeframe + "]")
+
 ##########################################################################################
 
 
@@ -140,17 +163,17 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
         if(len(Signals)>0):
             
-            M1Signals      = ("[BUY M1 NOW]" in Signals or 
-                              "[SELL M1 NOW]" in Signals)
+            M1Signals      = ("[BUY M1]"  in Signals or 
+                              "[SELL M1]" in Signals)
             
-            M2_M5Signals   = ("[BUY M2 NOW]" in Signals  or
-                              "[BUY M3 NOW]" in Signals  or
-                              "[BUY M4 NOW]" in Signals  or
-                              "[BUY M5 NOW]" in Signals  or
-                              "[SELL M2 NOW]" in Signals or
-                              "[SELL M3 NOW]" in Signals or
-                              "[SELL M4 NOW]" in Signals or
-                              "[SELL M5 NOW]" in Signals)
+            M2_M5Signals   = ("[BUY M2]"  in Signals  or
+                              "[BUY M3]"  in Signals  or
+                              "[BUY M4]"  in Signals  or
+                              "[BUY M5]"  in Signals  or
+                              "[SELL M2]" in Signals  or
+                              "[SELL M3]" in Signals  or
+                              "[SELL M4]" in Signals  or
+                              "[SELL M5]" in Signals)
             
             if(M1Signals):
                 display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX "+" ".join(Signals)+"\n"
