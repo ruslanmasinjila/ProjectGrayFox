@@ -71,7 +71,8 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
-numCandles     = 200
+numCandles     = 1000
+window         = 20
 offset         = 1
 
 Signals   = []
@@ -84,116 +85,59 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    ichimokuValues                           = ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    senkouSpanA_B                            = ichimokuValues[0]["ISA_9"] - ichimokuValues[0]["ISB_26"]
-    futureSenkouSpanA_B                      = ichimokuValues[1]["ISA_9"] - ichimokuValues[1]["ISB_26"]
+    # Calculate Moving Averages
+    rates_frame['ma'] = ta.sma(rates_frame['close'],length=window)
 
+    # Calculate Relative Strength Index
+    rates_frame['rsi'] = ta.rsi(rates_frame['close'],length=window)
 
-    #####################################################################################################
-    # CURRENT STATE
-    #####################################################################################################
+    # Calculate Bollinger Bands
+    BollingerBands           = ta.bbands(rates_frame["close"],length=window)
+    rates_frame['bb_upper']  = BollingerBands["BBU_20_2.0"]
+    rates_frame['bb_middle'] = BollingerBands["BBM_20_2.0"]
+    rates_frame['bb_lower']  = BollingerBands["BBL_20_2.0"]
     
-    tenkanSen_0                              = ichimokuValues[0]["ITS_9"].iloc[-1]      
-    kijunSen_0                               = ichimokuValues[0]["IKS_26"].iloc[-1]     
-    senkouSpanA_0                            = ichimokuValues[0]["ISA_9"].iloc[-1]      
-    senkouSpanB_0                            = ichimokuValues[0]["ISB_26"].iloc[-1]
-    candleClose_0                            = rates_frame["close"].iloc[-1]
-    
-    chikouSpan_L26                           = ichimokuValues[0]["ICS_26"].iloc[-27]
-    tenkanSen_L26                            = ichimokuValues[0]["ITS_9"].iloc[-27]      
-    kijunSen_L26                             = ichimokuValues[0]["IKS_26"].iloc[-27]     
-    senkouSpanA_L26                          = ichimokuValues[0]["ISA_9"].iloc[-27]      
-    senkouSpanB_L26                          = ichimokuValues[0]["ISB_26"].iloc[-27]
-    candleOpen_L26                           = rates_frame["open"].iloc[-27]
-    candleClose_L26                          = rates_frame["close"].iloc[-27]
+   
 
-    
-    senkouSpanA_R26                          = ichimokuValues[1]["ISA_9"].iloc[-1]      
-    senkouSpanB_R26                          = ichimokuValues[1]["ISB_26"].iloc[-1]
-    
-    #####################################################################################################
-    # PREVIOUS STATE
-    #####################################################################################################
-    
-    tenkanSen_L1                             = ichimokuValues[0]["ITS_9"].iloc[-2]      
-    kijunSen_L1                              = ichimokuValues[0]["IKS_26"].iloc[-2]     
-    senkouSpanA_L1                           = ichimokuValues[0]["ISA_9"].iloc[-2]      
-    senkouSpanB_L1                           = ichimokuValues[0]["ISB_26"].iloc[-2]
-    candleClose_L1                           = rates_frame["close"].iloc[-2]
-    
-    chikouSpan_L27                           = ichimokuValues[0]["ICS_26"].iloc[-28]
-    tenkanSen_L27                            = ichimokuValues[0]["ITS_9"].iloc[-28]      
-    kijunSen_L27                             = ichimokuValues[0]["IKS_26"].iloc[-28]     
-    senkouSpanA_L27                          = ichimokuValues[0]["ISA_9"].iloc[-28]      
-    senkouSpanB_L27                          = ichimokuValues[0]["ISB_26"].iloc[-28]
-    candleOpen_L27                           = rates_frame["open"].iloc[-28]
-    candleClose_L27                          = rates_frame["close"].iloc[-28]
-    
-    senkouSpanA_R25                          = ichimokuValues[1]["ISA_9"].iloc[-2]      
-    senkouSpanB_R25                          = ichimokuValues[1]["ISB_26"].iloc[-2]
+    # Calculate Stochastic Oscillator
+    rates_frame['stoch'] = ta.stoch(rates_frame['close'],length=window)
+
+    # Calculate MACD
+    rates_frame['macd'], rates_frame['macd_signal'], rates_frame['macd_hist'] = ta.macd(rates_frame['close'],length=window)
+
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    buyNowCondition      =  ((senkouSpanA_B.iloc[-28:]<0).all()  and
-                             chikouSpan_L27  < senkouSpanB_L27   and
-                             chikouSpan_L26  > senkouSpanB_L26   and
-                             candleClose_0   > senkouSpanB_0     and
-                             tenkanSen_0     > kijunSen_0        and
-                             senkouSpanA_R26 > senkouSpanB_R26)
-    
-    generalBuyCondition  = (candleClose_0    > tenkanSen_0      and
-                            candleClose_0    > kijunSen_0       and
-                            candleClose_0    > senkouSpanA_0    and
-                            candleClose_0    > senkouSpanB_0    and
-                            tenkanSen_0      > kijunSen_0       and
-                            
-                            chikouSpan_L26   > tenkanSen_L26    and
-                            chikouSpan_L26   > kijunSen_L26     and
-                            chikouSpan_L26   > senkouSpanA_L26  and
-                            chikouSpan_L26   > senkouSpanB_L26  and
-                            chikouSpan_L26   > candleOpen_L26   and
-                            chikouSpan_L26   > candleClose_L26  and
-                            senkouSpanA_R26  > senkouSpanB_R26)
-    
-    if(buyNowCondition):
-        Signals.append("[BUY " + strTimeframe + " NOW]")
-        
-    if(generalBuyCondition):
-        Signals.append("[BUY " + strTimeframe + "]")
-        
+    # Check if the close price is above the moving average
+    if rates_frame['close'].iloc[-1] > rates_frame['ma'].iloc[-1]:
+        # Check if the RSI is above 50
+        if rates_frame['rsi'].iloc[-1] > 50:
+            # Check if the close price is above the Bollinger Band upper line
+            if rates_frame['close'].iloc[-1] > rates_frame['bb_upper'].iloc[-1]:
+                # Check if the Stochastic Oscillator is above 80
+                if rates_frame['stoch'].iloc[-1] > 80:
+                    # Check if the MACD histogram is positive
+                    if rates_frame['macd_hist'].iloc[-1] > 0:
+                        Signals.append("[BUY " + strTimeframe + "]")
+                
     #####################################################################################################
     # SELL SIGNAL
-    #####################################################################################################    
-        
-    sellNowCondition      =  ((senkouSpanA_B.iloc[-28:]>0).all() and
-                             chikouSpan_L27  > senkouSpanB_L27    and
-                             chikouSpan_L26  < senkouSpanB_L26    and
-                             candleClose_0   < senkouSpanB_0      and
-                             tenkanSen_0     < kijunSen_0         and
-                             senkouSpanA_R26 < senkouSpanB_R26)
-        
-        
-    generalSellCondition  =(candleClose_0    < tenkanSen_0      and
-                            candleClose_0    < kijunSen_0       and
-                            candleClose_0    < senkouSpanA_0    and
-                            candleClose_0    < senkouSpanB_0    and
-                            tenkanSen_0      < kijunSen_0       and
-                            
-                            chikouSpan_L26   < tenkanSen_L26    and
-                            chikouSpan_L26   < kijunSen_L26     and
-                            chikouSpan_L26   < senkouSpanA_L26  and
-                            chikouSpan_L26   < senkouSpanB_L26  and
-                            chikouSpan_L26   < candleOpen_L26   and
-                            chikouSpan_L26   < candleClose_L26  and
-                            senkouSpanA_R26  < senkouSpanB_R26)
-    if(sellNowCondition):
-        Signals.append("[SELL " + strTimeframe + " NOW]")
+    #####################################################################################################
     
-    if(generalSellCondition):
-        Signals.append("[SELL " + strTimeframe + "]")
-        
+    # Check if the close price is below the moving average
+    if rates_frame['close'].iloc[-1] < rates_frame['ma'].iloc[-1]:
+        # Check if the RSI is below 50
+        if rates_frame['rsi'].iloc[-1] < 50:
+            # Check if the close price is below the Bollinger Band upper line
+            if rates_frame['close'].iloc[-1] < rates_frame['bb_lower'].iloc[-1]:
+                # Check if the Stochastic Oscillator is below 20
+                if rates_frame['stoch'].iloc[-1] < 20:
+                    # Check if the MACD histogram is positive
+                    if rates_frame['macd_hist'].iloc[-1] > 0:
+                        Signals.append("[SELL " + strTimeframe + "]")
+
 ##########################################################################################
 
 
@@ -227,17 +171,17 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
         if(len(Signals)>0):
             
-            M1Signals      = ("[BUY M1 NOW]"  in Signals or 
-                              "[SELL M1 NOW]" in Signals)
+            M1Signals      = ("[BUY M1]" in Signals or 
+                              "[SELL M1]" in Signals)
             
-            M2_M5Signals   = ("[BUY M2 NOW]"  in Signals or
-                              "[BUY M3 NOW]"  in Signals or
-                              "[BUY M4 NOW]"  in Signals or
-                              "[BUY M5 NOW]"  in Signals or
-                              "[SELL M2 NOW]" in Signals or
-                              "[SELL M3 NOW]" in Signals or
-                              "[SELL M4 NOW]" in Signals or
-                              "[SELL M5 NOW]" in Signals)
+            M2_M5Signals   = ("[BUY M2]" in Signals  or
+                              "[BUY M3]" in Signals  or
+                              "[BUY M4]" in Signals  or
+                              "[BUY M5]" in Signals  or
+                              "[SELL M2]" in Signals or
+                              "[SELL M3]" in Signals or
+                              "[SELL M4]" in Signals or
+                              "[SELL M5]" in Signals)
             
             if(M1Signals):
                 display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX "+" ".join(Signals)+"\n"
