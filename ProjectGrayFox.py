@@ -12,15 +12,13 @@ import MetaTrader5 as mt5
 import pandas as pd
 import pandas_ta as ta
 import numpy as np
-import more_itertools as mit
 import time
 import os
 
 import winsound
 duration  = 50
-freq1     = 2000
-freq2     = 1500
-freq3     = 1000
+freq1     = 1500
+freq2     = 1000
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -32,7 +30,7 @@ pd.set_option('display.width', 1500)
 if not mt5.initialize():
     print("initialize() FAILED, ERROR CODE =",mt5.last_error())
     quit()
-
+    
 ##########################################################################################
 
 
@@ -72,7 +70,6 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
 numCandles     = 1000
-window         = 20
 offset         = 1
 
 Signals   = []
@@ -85,59 +82,66 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    # Calculate Moving Averages
-    rates_frame['ma'] = ta.sma(rates_frame['close'],length=window)
-
-    # Calculate Relative Strength Index
-    rates_frame['rsi'] = ta.rsi(rates_frame['close'],length=window)
-
-    # Calculate Bollinger Bands
-    BollingerBands           = ta.bbands(rates_frame["close"],length=window)
-    rates_frame['bb_upper']  = BollingerBands["BBU_20_2.0"]
-    rates_frame['bb_middle'] = BollingerBands["BBM_20_2.0"]
-    rates_frame['bb_lower']  = BollingerBands["BBL_20_2.0"]
+    rates_frame["tema50"] = ta.tema(rates_frame["close"],length=50)
+    rates_frame["tema45"] = ta.tema(rates_frame["close"],length=45)
+    rates_frame["tema40"] = ta.tema(rates_frame["close"],length=40)
+    rates_frame["tema35"] = ta.tema(rates_frame["close"],length=35)
+    rates_frame["tema30"] = ta.tema(rates_frame["close"],length=30)
+    rates_frame["tema25"] = ta.tema(rates_frame["close"],length=25)
+    rates_frame["tema20"] = ta.tema(rates_frame["close"],length=20)
     
    
-
-    # Calculate Stochastic Oscillator
-    rates_frame['stoch'] = ta.stoch(rates_frame['close'],length=window)
-
-    # Calculate MACD
-    rates_frame['macd'], rates_frame['macd_signal'], rates_frame['macd_hist'] = ta.macd(rates_frame['close'],length=window)
-
+    currentTEMA50             = rates_frame["tema50"].iloc[-1]
+    currentTEMA45             = rates_frame["tema45"].iloc[-1]
+    currentTEMA40             = rates_frame["tema40"].iloc[-1]
+    currentTEMA35             = rates_frame["tema35"].iloc[-1]
+    currentTEMA30             = rates_frame["tema30"].iloc[-1]
+    currentTEMA25             = rates_frame["tema25"].iloc[-1]
+    currentTEMA20             = rates_frame["tema20"].iloc[-1]
     
-    #####################################################################################################
+    previousTEMA50            = rates_frame["tema50"].iloc[-2]
+    previousTEMA45            = rates_frame["tema45"].iloc[-2]
+    previousTEMA40            = rates_frame["tema40"].iloc[-2]
+    previousTEMA35            = rates_frame["tema35"].iloc[-2]
+    previousTEMA30            = rates_frame["tema30"].iloc[-2]
+    previousTEMA25            = rates_frame["tema25"].iloc[-2]
+    previousTEMA20            = rates_frame["tema20"].iloc[-2]
+    
+    
+    
     # BUY SIGNAL
-    #####################################################################################################
-    
-    # Check if the close price is above the moving average
-    if rates_frame['close'].iloc[-1] > rates_frame['ma'].iloc[-1]:
-        # Check if the RSI is above 50
-        if rates_frame['rsi'].iloc[-1] > 50:
-            # Check if the close price is above the Bollinger Band upper line
-            if rates_frame['close'].iloc[-1] > rates_frame['bb_upper'].iloc[-1]:
-                # Check if the Stochastic Oscillator is above 80
-                if rates_frame['stoch'].iloc[-1] > 80:
-                    # Check if the MACD histogram is positive
-                    if rates_frame['macd_hist'].iloc[-1] > 0:
-                        Signals.append("[BUY " + strTimeframe + "]")
-                
-    #####################################################################################################
-    # SELL SIGNAL
-    #####################################################################################################
-    
-    # Check if the close price is below the moving average
-    if rates_frame['close'].iloc[-1] < rates_frame['ma'].iloc[-1]:
-        # Check if the RSI is below 50
-        if rates_frame['rsi'].iloc[-1] < 50:
-            # Check if the close price is below the Bollinger Band upper line
-            if rates_frame['close'].iloc[-1] < rates_frame['bb_lower'].iloc[-1]:
-                # Check if the Stochastic Oscillator is below 20
-                if rates_frame['stoch'].iloc[-1] < 20:
-                    # Check if the MACD histogram is positive
-                    if rates_frame['macd_hist'].iloc[-1] > 0:
-                        Signals.append("[SELL " + strTimeframe + "]")
-
+    if(previousTEMA50<previousTEMA45 and
+       previousTEMA45<previousTEMA40 and
+       previousTEMA40<previousTEMA35 and
+       previousTEMA35<previousTEMA30 and
+       previousTEMA30<previousTEMA25 and
+       previousTEMA25<previousTEMA20):
+        pass
+    else:     
+        if(currentTEMA50<currentTEMA45 and
+           currentTEMA45<currentTEMA40 and
+           currentTEMA40<currentTEMA35 and
+           currentTEMA35<currentTEMA30 and
+           currentTEMA30<currentTEMA25 and
+           currentTEMA25<currentTEMA20):
+            Signals.append("[BUY " + strTimeframe + "]")
+            
+    # BUY SIGNAL
+    if(previousTEMA50>previousTEMA45 and
+       previousTEMA45>previousTEMA40 and
+       previousTEMA40>previousTEMA35 and
+       previousTEMA35>previousTEMA30 and
+       previousTEMA30>previousTEMA25 and
+       previousTEMA25>previousTEMA20):
+        pass
+    else:     
+        if(currentTEMA50>currentTEMA45 and
+           currentTEMA45>currentTEMA40 and
+           currentTEMA40>currentTEMA35 and
+           currentTEMA35>currentTEMA30 and
+           currentTEMA30>currentTEMA25 and
+           currentTEMA25>currentTEMA20):
+            Signals.append("[SELL " + strTimeframe + "]")
 ##########################################################################################
 
 
@@ -171,13 +175,13 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
         if(len(Signals)>0):
             
-            M1Signals      = ("[BUY M1]" in Signals or 
+            M1Signals      = ("[BUY M1]"  in Signals or 
                               "[SELL M1]" in Signals)
             
-            M2_M5Signals   = ("[BUY M2]" in Signals  or
-                              "[BUY M3]" in Signals  or
-                              "[BUY M4]" in Signals  or
-                              "[BUY M5]" in Signals  or
+            M2_M5Signals   = ("[BUY M2]"  in Signals or
+                              "[BUY M3]"  in Signals or
+                              "[BUY M4]"  in Signals or
+                              "[BUY M5]"  in Signals or
                               "[SELL M2]" in Signals or
                               "[SELL M3]" in Signals or
                               "[SELL M4]" in Signals or
