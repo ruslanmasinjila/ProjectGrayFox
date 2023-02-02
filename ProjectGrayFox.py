@@ -259,13 +259,13 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
         if(len(Signals)>0):
             
-            M1Signals      = ("[BUY M1 NOW]" in Signals or 
+            M1Signals      = ("[BUY M1 NOW]"  in Signals or 
                               "[SELL M1 NOW]" in Signals)
             
-            M2_M5Signals   = ("[BUY M2 NOW]" in Signals  or
-                              "[BUY M3 NOW]" in Signals  or
-                              "[BUY M4 NOW]" in Signals  or
-                              "[BUY M5 NOW]" in Signals  or
+            M2_M5Signals   = ("[BUY M2 NOW]"  in Signals  or
+                              "[BUY M3 NOW]"  in Signals  or
+                              "[BUY M4 NOW]"  in Signals  or
+                              "[BUY M5 NOW]"  in Signals  or
                               "[SELL M2 NOW]" in Signals or
                               "[SELL M3 NOW]" in Signals or
                               "[SELL M4 NOW]" in Signals or
