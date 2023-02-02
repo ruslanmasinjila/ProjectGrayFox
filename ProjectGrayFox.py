@@ -84,54 +84,54 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    ichimokuValues                           = ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    rates_frame["rsi26"]                     = ta.rsi(rates_frame["close"],length=26)
+    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
+    rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
     #####################################################################################################
     # CURRENT STATE
     #####################################################################################################
     
-    tenkanSen_0                              = ichimokuValues[0]["ITS_9"].iloc[-1]      
-    kijunSen_0                               = ichimokuValues[0]["IKS_26"].iloc[-1]     
-    senkouSpanA_0                            = ichimokuValues[0]["ISA_9"].iloc[-1]      
-    senkouSpanB_0                            = ichimokuValues[0]["ISB_26"].iloc[-1]
-    candleClose_0                            = rates_frame["close"].iloc[-1]
+    tenkanSen_0                               =  ichimokuValues[0]["ITS_9"].iloc[-1]      
+    kijunSen_0                                =  ichimokuValues[0]["IKS_26"].iloc[-1]     
+    senkouSpanA_0                             =  ichimokuValues[0]["ISA_9"].iloc[-1]      
+    senkouSpanB_0                             =  ichimokuValues[0]["ISB_26"].iloc[-1]
+    candleClose_0                             =  rates_frame["close"].iloc[-1]
     
-    chikouSpan_L26                           = ichimokuValues[0]["ICS_26"].iloc[-27]
-    tenkanSen_L26                            = ichimokuValues[0]["ITS_9"].iloc[-27]      
-    kijunSen_L26                             = ichimokuValues[0]["IKS_26"].iloc[-27]     
-    senkouSpanA_L26                          = ichimokuValues[0]["ISA_9"].iloc[-27]      
-    senkouSpanB_L26                          = ichimokuValues[0]["ISB_26"].iloc[-27]
-    candleOpen_L26                           = rates_frame["open"].iloc[-27]
-    candleClose_L26                          = rates_frame["close"].iloc[-27]
+    chikouSpan_L26                            =  ichimokuValues[0]["ICS_26"].iloc[-27]
+    tenkanSen_L26                             =  ichimokuValues[0]["ITS_9"].iloc[-27]      
+    kijunSen_L26                              =  ichimokuValues[0]["IKS_26"].iloc[-27]     
+    senkouSpanA_L26                           =  ichimokuValues[0]["ISA_9"].iloc[-27]      
+    senkouSpanB_L26                           =  ichimokuValues[0]["ISB_26"].iloc[-27]
+    candleOpen_L26                            =  rates_frame["open"].iloc[-27]
+    candleClose_L26                           =  rates_frame["close"].iloc[-27]
 
     
-    senkouSpanA_R26                          = ichimokuValues[1]["ISA_9"].iloc[-1]      
-    senkouSpanB_R26                          = ichimokuValues[1]["ISB_26"].iloc[-1]
+    senkouSpanA_R26                           =  ichimokuValues[1]["ISA_9"].iloc[-1]      
+    senkouSpanB_R26                           =  ichimokuValues[1]["ISB_26"].iloc[-1]
     
-    currentRSI26                             = rates_frame.iloc[-1].rsi26
+    currentRSI26                              =  rates_frame.iloc[-1].rsi26
     
     #####################################################################################################
     # PREVIOUS STATE
     #####################################################################################################
     
-    tenkanSen_L1                             = ichimokuValues[0]["ITS_9"].iloc[-2]      
-    kijunSen_L1                              = ichimokuValues[0]["IKS_26"].iloc[-2]     
-    senkouSpanA_L1                           = ichimokuValues[0]["ISA_9"].iloc[-2]      
-    senkouSpanB_L1                           = ichimokuValues[0]["ISB_26"].iloc[-2]
-    candleClose_L1                           = rates_frame["close"].iloc[-2]
+    tenkanSen_L1                              =  ichimokuValues[0]["ITS_9"].iloc[-2]      
+    kijunSen_L1                               =  ichimokuValues[0]["IKS_26"].iloc[-2]     
+    senkouSpanA_L1                            =  ichimokuValues[0]["ISA_9"].iloc[-2]      
+    senkouSpanB_L1                            =  ichimokuValues[0]["ISB_26"].iloc[-2]
+    candleClose_L1                            =  rates_frame["close"].iloc[-2]
     
-    chikouSpan_L27                           = ichimokuValues[0]["ICS_26"].iloc[-28]
-    tenkanSen_L27                            = ichimokuValues[0]["ITS_9"].iloc[-28]      
-    kijunSen_L27                             = ichimokuValues[0]["IKS_26"].iloc[-28]     
-    senkouSpanA_L27                          = ichimokuValues[0]["ISA_9"].iloc[-28]      
-    senkouSpanB_L27                          = ichimokuValues[0]["ISB_26"].iloc[-28]
-    candleOpen_L27                           = rates_frame["open"].iloc[-28]
-    candleClose_L27                          = rates_frame["close"].iloc[-28]
+    chikouSpan_L27                            =  ichimokuValues[0]["ICS_26"].iloc[-28]
+    tenkanSen_L27                             =  ichimokuValues[0]["ITS_9"].iloc[-28]      
+    kijunSen_L27                              =  ichimokuValues[0]["IKS_26"].iloc[-28]     
+    senkouSpanA_L27                           =  ichimokuValues[0]["ISA_9"].iloc[-28]      
+    senkouSpanB_L27                           =  ichimokuValues[0]["ISB_26"].iloc[-28]
+    candleOpen_L27                            =  rates_frame["open"].iloc[-28]
+    candleClose_L27                           =  rates_frame["close"].iloc[-28]
     
-    senkouSpanA_R25                          = ichimokuValues[1]["ISA_9"].iloc[-2]      
-    senkouSpanB_R25                          = ichimokuValues[1]["ISB_26"].iloc[-2]
+    senkouSpanA_R25                           =  ichimokuValues[1]["ISA_9"].iloc[-2]      
+    senkouSpanB_R25                           =  ichimokuValues[1]["ISB_26"].iloc[-2]
     
-    previousRSI26                            = rates_frame.iloc[-2].rsi26
+    previousRSI26                             =  rates_frame.iloc[-2].rsi26
     
     #####################################################################################################
     # BUY SIGNAL
@@ -201,21 +201,21 @@ def getSignals(rates_frame,strTimeframe):
                               previousRSI26   <  50)
     
     
-    currentSellCondition  = (candleClose_0    < tenkanSen_0      and
-                             candleClose_0    < kijunSen_0       and
-                             candleClose_0    < senkouSpanA_0    and
-                             candleClose_0    < senkouSpanB_0    and
-                             tenkanSen_0      < kijunSen_0       and
+    currentSellCondition  = (candleClose_0    <  tenkanSen_0     and
+                             candleClose_0    <  kijunSen_0      and
+                             candleClose_0    <  senkouSpanA_0   and
+                             candleClose_0    <  senkouSpanB_0   and
+                             tenkanSen_0      <  kijunSen_0      and
                             
-                             chikouSpan_L26   < tenkanSen_L26    and
-                             chikouSpan_L26   < kijunSen_L26     and
-                             chikouSpan_L26   < senkouSpanA_L26  and
-                             chikouSpan_L26   < senkouSpanB_L26  and
-                             chikouSpan_L26   < candleOpen_L26   and
-                             chikouSpan_L26   < candleClose_L26  and
-                            (chikouSpan_L26   < rates_frame["open"].iloc[-26:-2]).all()  and
-                            (chikouSpan_L26   < rates_frame["close"].iloc[-26:-2]).all() and
-                             senkouSpanA_R26  < senkouSpanB_R26  and
+                             chikouSpan_L26   <  tenkanSen_L26   and
+                             chikouSpan_L26   <  kijunSen_L26    and
+                             chikouSpan_L26   <  senkouSpanA_L26 and
+                             chikouSpan_L26   <  senkouSpanB_L26 and
+                             chikouSpan_L26   <  candleOpen_L26  and
+                             chikouSpan_L26   <  candleClose_L26 and
+                            (chikouSpan_L26   <  rates_frame["open"].iloc[-26:-2]).all()  and
+                            (chikouSpan_L26   <  rates_frame["close"].iloc[-26:-2]).all() and
+                             senkouSpanA_R26  <  senkouSpanB_R26  and
                              currentRSI26     <  50)
     
 
@@ -262,10 +262,10 @@ while(True):
             M1Signals      = ("[BUY M1 NOW]"  in Signals or 
                               "[SELL M1 NOW]" in Signals)
             
-            M2_M5Signals   = ("[BUY M2 NOW]"  in Signals  or
-                              "[BUY M3 NOW]"  in Signals  or
-                              "[BUY M4 NOW]"  in Signals  or
-                              "[BUY M5 NOW]"  in Signals  or
+            M2_M5Signals   = ("[BUY M2 NOW]"  in Signals or
+                              "[BUY M3 NOW]"  in Signals or
+                              "[BUY M4 NOW]"  in Signals or
+                              "[BUY M5 NOW]"  in Signals or
                               "[SELL M2 NOW]" in Signals or
                               "[SELL M3 NOW]" in Signals or
                               "[SELL M4 NOW]" in Signals or
@@ -287,5 +287,6 @@ while(True):
     print(display)
     time.sleep(60)
     os.system('cls' if os.name == 'nt' else 'clear')
+    
 ##########################################################################################
 
