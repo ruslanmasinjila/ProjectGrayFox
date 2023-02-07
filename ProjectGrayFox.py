@@ -19,7 +19,7 @@ import os
 import winsound
 duration  = 50
 freq1     = 2000
-freq2     = 2000
+freq2     = 1000
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
