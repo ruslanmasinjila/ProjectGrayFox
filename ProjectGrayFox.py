@@ -166,8 +166,12 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
             
         if(len(Signals)>0):
-            display+="********************************************\n"+" ".join(Signals)+"\n"
-            winsound.Beep(freq, duration)   
+            if(Signals[0]=="[BUY M1]" or Signals[0]=="[SELL M1]"):
+                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
+                winsound.Beep(freq, duration)
+            else:
+                display+="********************************************\n"+" ".join(Signals)+"\n"
+                
         display+="==============================\n"
     print(display)
     time.sleep(60)
