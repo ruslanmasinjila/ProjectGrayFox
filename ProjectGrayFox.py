@@ -116,6 +116,7 @@ def getSignals(rates_frame,strTimeframe):
     if(tenkanSen_0 > kijunSen_0):
         if(tenkanSen_0 == tenkanSen_L1 and kijunSen_0 == kijunSen_L1):
             if(senkouSpanA_0 < senkouSpanB_0 and senkouSpanA_L1 < senkouSpanB_L1):
+                if(kijunSen_0 < senkouSpanB_0 and kijunSen_L1 < senkouSpanB_L1):
                     if(futureSenkouSpanA.iloc[-1]>futureSenkouSpanB.iloc[-1]):
                         if(currentRSI26 > 50):
                             Signals.append("[BUY " + strTimeframe + "]")
@@ -127,8 +128,9 @@ def getSignals(rates_frame,strTimeframe):
     if(tenkanSen_0 < kijunSen_0):
         if(tenkanSen_0 == tenkanSen_L1 and kijunSen_0 == kijunSen_L1):
             if(senkouSpanA_0 > senkouSpanB_0 and senkouSpanA_L1 > senkouSpanB_L1):
-                    if(futureSenkouSpanA.iloc[-1] < futureSenkouSpanB.iloc[-1]):
-                        if(currentRSI26 > 50):
+                if(kijunSen_0 > senkouSpanB_0 and kijunSen_L1 > senkouSpanB_L1):
+                    if(futureSenkouSpanA.iloc[-1]<futureSenkouSpanB.iloc[-1]):
+                        if(currentRSI26 < 50):
                             Signals.append("[SELL " + strTimeframe + "]")
                 
 ##########################################################################################
@@ -165,12 +167,8 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
             
         if(len(Signals)>0):
-            if(Signals[0]=="[BUY M1]" or Signals[0]=="SELL M1"):
-                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
-                winsound.Beep(freq, duration)
-            else:
-                display+="*********************************************\n"+" ".join(Signals)+"\n"
-                
+            display+="********************************************\n"+" ".join(Signals)+"\n"
+            winsound.Beep(freq, duration)   
         display+="==============================\n"
     print(display)
     time.sleep(60)
