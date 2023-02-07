@@ -18,7 +18,8 @@ import os
 
 import winsound
 duration  = 50
-freq      = 1500
+freq1     = 2000
+freq2     = 2000
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -167,11 +168,12 @@ while(True):
             
         if(len(Signals)>0):
             if(all("BUY" in Signal for Signal in Signals) or all("SELL" in Signal for Signal in Signals)):
-            if(Signals[0]=="[BUY M1]" or Signals[0]=="[SELL M1]"):
-                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
-                winsound.Beep(freq, duration)
-            else:
-                display+="********************************************\n"+" ".join(Signals)+"\n"
+                if(Signals[0]=="[BUY M1]" or Signals[0]=="[SELL M1]"):
+                    display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
+                    winsound.Beep(freq1, duration)
+                else:
+                    display+="********************************************\n"+" ".join(Signals)+"\n"
+                    winsound.Beep(freq2, duration)
                 
         display+="==============================\n"
     print(display)
