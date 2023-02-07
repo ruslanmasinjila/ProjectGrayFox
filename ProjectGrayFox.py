@@ -115,10 +115,11 @@ def getSignals(rates_frame,strTimeframe):
     
     if(tenkanSen_0 > kijunSen_0):
         if(tenkanSen_0 == tenkanSen_L1 and kijunSen_0 == kijunSen_L1):
-            if(senkouSpanA_0 > senkouSpanB_0 and senkouSpanA_L1 > senkouSpanB_L1):
-                if((futureSenkouSpanA-futureSenkouSpanB > 0).all()):
-                    if(currentRSI26 > 50):
-                        Signals.append("[BUY " + strTimeframe + "]")
+            if(senkouSpanA_0 < senkouSpanB_0 and senkouSpanA_L1 < senkouSpanB_L1):
+                if(candleClose_0 > tenkanSen_0):
+                    if(futureSenkouSpanA.iloc[-1]>futureSenkouSpanB.iloc[-1]):
+                            if(currentRSI26 > 50):
+                                Signals.append("[BUY " + strTimeframe + "]")
         
     #####################################################################################################
     # SELL SIGNAL
@@ -126,10 +127,11 @@ def getSignals(rates_frame,strTimeframe):
     
     if(tenkanSen_0 < kijunSen_0):
         if(tenkanSen_0 == tenkanSen_L1 and kijunSen_0 == kijunSen_L1):
-            if(senkouSpanA_0 < senkouSpanB_0 and senkouSpanA_L1 < senkouSpanB_L1):
-                if((futureSenkouSpanA-futureSenkouSpanB < 0).all()):
-                    if(currentRSI26 > 50):
-                        Signals.append("[SELL " + strTimeframe + "]")
+            if(senkouSpanA_0 > senkouSpanB_0 and senkouSpanA_L1 > senkouSpanB_L1):
+                if(candleClose_0 < tenkanSen_0):
+                    if(futureSenkouSpanA.iloc[-1] < futureSenkouSpanB.iloc[-1]):
+                            if(currentRSI26 > 50):
+                                Signals.append("[SELL " + strTimeframe + "]")
                 
 ##########################################################################################
 
