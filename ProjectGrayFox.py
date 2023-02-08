@@ -108,20 +108,22 @@ def getSignals(rates_frame,strTimeframe):
     # BUY SIGNAL
     #####################################################################################################
     if(tenkanSen_0 > kijunSen_0):
-        if(senkouSpanA_R26 > senkouSpanB_R26):
-            if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
-                if(currentRSI26 < 50):
-                    Signals.append("[BUY " + strTimeframe + "]")  
+        if(kijunSen_0 > senkouSpanA_0 and kijunSen_0 > senkouSpanB_0):
+            if(senkouSpanA_R26 > senkouSpanB_R26):
+                if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
+                    if(currentRSI26 < 50):
+                        Signals.append("[BUY " + strTimeframe + "]")  
         
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(tenkanSen_0 < kijunSen_0):
-        if(senkouSpanA_R26 < senkouSpanB_R26):
-            if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
-                if(currentRSI26 < 50):
-                    Signals.append("[SELL " + strTimeframe + "]") 
+        if(kijunSen_0 < senkouSpanA_0 and kijunSen_0 < senkouSpanB_0):
+            if(senkouSpanA_R26 < senkouSpanB_R26):
+                if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
+                    if(currentRSI26 < 50):
+                        Signals.append("[SELL " + strTimeframe + "]") 
                     
 ##########################################################################################
 
