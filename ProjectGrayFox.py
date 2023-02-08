@@ -70,7 +70,7 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
-numCandles     = 1000
+numCandles     = 200
 offset         = 1
 
 Signals   = []
@@ -83,85 +83,48 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rates_frame["median"] = (rates_frame["high"]+rates_frame["low"])/2
-    rates_frame["ema50"] = ta.ema(rates_frame["median"],length=50)
-    rates_frame["ema45"] = ta.ema(rates_frame["median"],length=45)
-    rates_frame["ema40"] = ta.ema(rates_frame["median"],length=40)
-    rates_frame["ema35"] = ta.ema(rates_frame["median"],length=35)
-    rates_frame["ema30"] = ta.ema(rates_frame["median"],length=30)
-    rates_frame["ema25"] = ta.ema(rates_frame["median"],length=25)
-    rates_frame["ema20"] = ta.ema(rates_frame["median"],length=20)
+    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
+    rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
+    #####################################################################################################
+    # CURRENT STATE
+    #####################################################################################################
     
-    rates_frame["rsi50"] = ta.rsi(rates_frame["median"],length=50)
-    rates_frame["rsi45"] = ta.rsi(rates_frame["median"],length=45)
-    rates_frame["rsi40"] = ta.rsi(rates_frame["median"],length=40)
-    rates_frame["rsi35"] = ta.rsi(rates_frame["median"],length=35)
-    rates_frame["rsi30"] = ta.rsi(rates_frame["median"],length=30)
-    rates_frame["rsi25"] = ta.rsi(rates_frame["median"],length=25)
-    rates_frame["rsi20"] = ta.rsi(rates_frame["median"],length=20)
+    tenkanSen_0                               =  ichimokuValues[0]["ITS_9"].iloc[-1]      
+    kijunSen_0                                =  ichimokuValues[0]["IKS_26"].iloc[-1]     
+    senkouSpanA_0                             =  ichimokuValues[0]["ISA_9"].iloc[-1]      
+    senkouSpanB_0                             =  ichimokuValues[0]["ISB_26"].iloc[-1]
+    candleOpen_0                              =  rates_frame["open"].iloc[-1]
+    candleClose_0                             =  rates_frame["close"].iloc[-1]
+
     
+    futureSenkouSpanA                         =  ichimokuValues[1]["ISA_9"]     
+    futureSenkouSpanB                         =  ichimokuValues[1]["ISB_26"]
     
-    currentOpen             = rates_frame.iloc[-1].open
-    currentClose            = rates_frame.iloc[-1].close
-    currentHigh             = rates_frame.iloc[-1].high
-    currentLow              = rates_frame.iloc[-1].low
-    currentVolume           = rates_frame.iloc[-1].tick_volume
+    currentRSI26                              =  rates_frame.iloc[-1].rsi26
     
-    
-    currentEMA50            = rates_frame.iloc[-1].ema50
-    currentEMA45            = rates_frame.iloc[-1].ema45
-    currentEMA40            = rates_frame.iloc[-1].ema40
-    currentEMA35            = rates_frame.iloc[-1].ema35
-    currentEMA30            = rates_frame.iloc[-1].ema30
-    currentEMA25            = rates_frame.iloc[-1].ema25
-    currentEMA20            = rates_frame.iloc[-1].ema20
-    
-    currentRSI50            = rates_frame.iloc[-1].rsi50
-    currentRSI45            = rates_frame.iloc[-1].rsi45
-    currentRSI40            = rates_frame.iloc[-1].rsi40
-    currentRSI35            = rates_frame.iloc[-1].rsi35
-    currentRSI30            = rates_frame.iloc[-1].rsi30
-    currentRSI25            = rates_frame.iloc[-1].rsi25
-    currentRSI20            = rates_frame.iloc[-1].rsi20
+
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
-    
-    # BUY SIGNAL
-    if(currentEMA50<currentEMA45 and
-       currentEMA45<currentEMA40 and
-       currentEMA40<currentEMA35 and
-       currentEMA35<currentEMA30 and
-       currentEMA30<currentEMA25 and
-       currentEMA25<currentEMA20):
-        if(currentRSI50<currentRSI45 and
-           currentRSI45<currentRSI40 and
-           currentRSI40<currentRSI35 and
-           currentRSI35<currentRSI30 and
-           currentRSI30<currentRSI25 and
-           currentRSI25<currentRSI20):
-            Signals.append("[BUY " + strTimeframe + "]")
-            
+    if(tenkanSen_0 > kijunSen_0):
+        if(senkouSpanA_0 > senkouSpanB_0):
+            if((futureSenkouSpanA > futureSenkouSpanB).all()):
+                if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
+                    if(currentRSI26 < 50):
+                        Signals.append("[BUY " + strTimeframe + "]")  
+        
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-                                    
-    # SELL SIGNAL 
-    if(currentEMA50>currentEMA45 and
-       currentEMA45>currentEMA40 and
-       currentEMA40>currentEMA35 and
-       currentEMA35>currentEMA30 and
-       currentEMA30>currentEMA25 and
-       currentEMA25>currentEMA20):
-        if(currentRSI50>currentRSI45 and
-           currentRSI45>currentRSI40 and
-           currentRSI40>currentRSI35 and
-           currentRSI35>currentRSI30 and
-           currentRSI30>currentRSI25 and
-           currentRSI25>currentRSI20):
-            Signals.append("[SELL " + strTimeframe + "]")
-            
+    
+    if(tenkanSen_0 < kijunSen_0):
+        if(senkouSpanA_0 < senkouSpanB_0):
+            if((futureSenkouSpanA < futureSenkouSpanB).all()):
+                if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
+                    if(currentRSI26 < 50):
+                        Signals.append("[SELL " + strTimeframe + "]") 
+                    
 ##########################################################################################
 
 
