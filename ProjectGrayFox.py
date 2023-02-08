@@ -97,8 +97,8 @@ def getSignals(rates_frame,strTimeframe):
     candleClose_0                             =  rates_frame["close"].iloc[-1]
 
     
-    futureSenkouSpanA                         =  ichimokuValues[1]["ISA_9"]     
-    futureSenkouSpanB                         =  ichimokuValues[1]["ISB_26"]
+    senkouSpanA_R26                           =  ichimokuValues[1]["ISA_9"].iloc[-1]     
+    senkouSpanB_R26                           =  ichimokuValues[1]["ISB_26"].iloc[-1]
     
     currentRSI26                              =  rates_frame.iloc[-1].rsi26
     
@@ -108,22 +108,20 @@ def getSignals(rates_frame,strTimeframe):
     # BUY SIGNAL
     #####################################################################################################
     if(tenkanSen_0 > kijunSen_0):
-        if(senkouSpanA_0 > senkouSpanB_0):
-            if((futureSenkouSpanA > futureSenkouSpanB).all()):
-                if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
-                    if(currentRSI26 < 50):
-                        Signals.append("[BUY " + strTimeframe + "]")  
+        if(senkouSpanA_R26 > senkouSpanB_R26):
+            if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
+                if(currentRSI26 < 50):
+                    Signals.append("[BUY " + strTimeframe + "]")  
         
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(tenkanSen_0 < kijunSen_0):
-        if(senkouSpanA_0 < senkouSpanB_0):
-            if((futureSenkouSpanA < futureSenkouSpanB).all()):
-                if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
-                    if(currentRSI26 < 50):
-                        Signals.append("[SELL " + strTimeframe + "]") 
+        if(senkouSpanA_R26 < senkouSpanB_R26):
+            if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
+                if(currentRSI26 < 50):
+                    Signals.append("[SELL " + strTimeframe + "]") 
                     
 ##########################################################################################
 
