@@ -272,7 +272,7 @@ while(True):
             
         if(len(Signals)>0):
             #if(all("BUY" in Signal for Signal in Signals) or all("SELL" in Signal for Signal in Signals)):
-            if(all("NOW" in Signal for Signal in Signals)):
+            if(any("NOW" in Signal for Signal in Signals)):
                 display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
                 winsound.Beep(freq1, duration)
             else:
