@@ -150,8 +150,8 @@ def getSignals(rates_frame,strTimeframe):
                              chikouSpan_L27   >  candleOpen_L27  and
                              chikouSpan_L27   >  candleClose_L27 and
                              senkouSpanA_R25  >  senkouSpanB_R25 and
-                             previousRSI_0    >  previousRSI_L27 and
-                             previousRSI_0    >  50)
+                             previousRSI_0    >  50              and
+                             previousRSI_L27  <  50)
     
     # Previous Top Line of Sight between Chikou Span and current candle close
     previousTopLOS       = ((chikouSpan_L27   >  rates_frame["open"].iloc[-27:-3]).all() and
@@ -170,8 +170,8 @@ def getSignals(rates_frame,strTimeframe):
                              chikouSpan_L26   >  candleOpen_L26  and
                              chikouSpan_L26   >  candleClose_L26 and
                              senkouSpanA_R26  >  senkouSpanB_R26 and
-                             currentRSI_0     >  currentRSI_L26  and
-                             currentRSI_0     >  50)           
+                             currentRSI_0     >  50              and           
+                             currentRSI_L26   <  50)           
     
     # Current Top Line of Sight between Chikou Span and current candle close
     currentTopLOS        = ((chikouSpan_L26   >  rates_frame["open"].iloc[-26:-2]).all()  and
@@ -201,8 +201,8 @@ def getSignals(rates_frame,strTimeframe):
                               chikouSpan_L27  <  candleOpen_L27  and
                               chikouSpan_L27  <  candleClose_L27 and
                               senkouSpanA_R25 <  senkouSpanB_R25 and
-                              previousRSI_0   <  previousRSI_L27 and
-                              previousRSI_0   <  50)
+                              previousRSI_0   <  50              and
+                              previousRSI_L27 >  50)
     
     # Previous Bottom Line of Sight between Chikou Span and current candle close
     previousBottomLOS     = ((chikouSpan_L27  <  rates_frame["open"].iloc[-27:-3]).all() and
@@ -221,8 +221,8 @@ def getSignals(rates_frame,strTimeframe):
                              chikouSpan_L26   <  candleOpen_L26  and
                              chikouSpan_L26   <  candleClose_L26 and
                              senkouSpanA_R26  <  senkouSpanB_R26 and
-                             currentRSI_0     <  currentRSI_L26  and
-                             currentRSI_0     <  50)
+                             currentRSI_0     <  50              and
+                             currentRSI_L26   >  50)
     
     # Current Bottom Line of Sight between Chikou Span and current candle close
     currentBottomLOS      = ((chikouSpan_L26  <  rates_frame["open"].iloc[-26:-2]).all()  and
@@ -271,13 +271,13 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
             
         if(len(Signals)>0):
-            #if(all("BUY" in Signal for Signal in Signals) or all("SELL" in Signal for Signal in Signals)):
-            if(any("NOW" in Signal for Signal in Signals)):
-                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
-                winsound.Beep(freq1, duration)
-            else:
-                display+="********************************************\n"+" ".join(Signals)+"\n"
-                winsound.Beep(freq2, duration)
+            if(all("BUY" in Signal for Signal in Signals) or all("SELL" in Signal for Signal in Signals)):
+                if(any("NOW" in Signal for Signal in Signals)):
+                    display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
+                    winsound.Beep(freq1, duration)
+                else:
+                    display+="********************************************\n"+" ".join(Signals)+"\n"
+                    winsound.Beep(freq2, duration)
                 
         display+="==============================\n"
     print(display)
