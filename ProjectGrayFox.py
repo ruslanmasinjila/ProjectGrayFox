@@ -103,14 +103,20 @@ def getSignals(rates_frame,strTimeframe):
     # BUY SIGNAL
     #####################################################################################################
     if(tenkanSen_0 >= kijunSen_0):
+        if(senkouSpanA_0 > senkouSpanB_0):
             if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
                 Signals.append("[BUY " + strTimeframe + "]")  
+
+        
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     if(tenkanSen_0 <= kijunSen_0):
+        if(senkouSpanA_0 < senkouSpanB_0):
             if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
-                Signals.append("[SELL " + strTimeframe + "]")              
+                Signals.append("[SELL " + strTimeframe + "]") 
+
+                  
 ##########################################################################################
 
 
