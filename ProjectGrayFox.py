@@ -70,7 +70,7 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
 numCandles     = 200
-offset         = 1
+offset         = 0
 
 Signals   = []
 
@@ -82,41 +82,24 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
-    
-    tenkanSen_0                               =  ichimokuValues[0]["ITS_9"].iloc[-1]      
-    kijunSen_0                                =  ichimokuValues[0]["IKS_26"].iloc[-1]     
-    senkouSpanA_0                             =  ichimokuValues[0]["ISA_9"].iloc[-1]      
-    senkouSpanB_0                             =  ichimokuValues[0]["ISB_26"].iloc[-1]
-    candleOpen_0                              =  rates_frame["open"].iloc[-1]
-    candleClose_0                             =  rates_frame["close"].iloc[-1]
-    RSI_0                                     =  rates_frame.iloc[-1].rsi26
-    
-
-    
-    senkouSpanA_R26                           =  ichimokuValues[1]["ISA_9"].iloc[-1]      
-    senkouSpanB_R26                           =  ichimokuValues[1]["ISB_26"].iloc[-1]
-
+    rates_frame["tema21"] = ta.tema(rates_frame["close"],length=21)
+    currentTEMA21             = rates_frame["tema21"].iloc[-1]
+    previousTEMA21            = rates_frame["tema21"].iloc[-2]
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
-    if(tenkanSen_0 >= kijunSen_0):
-        if(senkouSpanA_0 > senkouSpanB_0):
-            if(candleOpen_0 < kijunSen_0 and candleClose_0 > tenkanSen_0):
-                Signals.append("[BUY " + strTimeframe + "]")  
-
-        
+    
+    if(currentTEMA21>previousTEMA21):
+        Signals.append("[BUY " + strTimeframe + "]")
+                
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-    if(tenkanSen_0 <= kijunSen_0):
-        if(senkouSpanA_0 < senkouSpanB_0):
-            if(candleOpen_0 > kijunSen_0 and candleClose_0 < tenkanSen_0):
-                Signals.append("[SELL " + strTimeframe + "]") 
+    
+    if(currentTEMA21<previousTEMA21):
+        Signals.append("[SELL " + strTimeframe + "]")
 
-                  
 ##########################################################################################
 
 
@@ -150,10 +133,23 @@ while(True):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
-        if(len(Signals)>0):
-            display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
+        sameSignals = []
+        if(len(Signals)>0):   
+            if(Signals[0]=="[BUY M1]"):
+                for i in Signals:
+                    if("BUY" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+            elif(Signals[0]=="[SELL M1]"):
+                for i in Signals:
+                    if("SELL" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+                        
+            display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
             winsound.Beep(freq, duration)
-
                 
         display+="==============================\n"
     print(display)
