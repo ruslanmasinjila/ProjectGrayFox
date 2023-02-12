@@ -18,7 +18,8 @@ import os
 
 import winsound
 duration  = 50
-freq      = 1500
+freq1     = 2000
+freq2     = 1500
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -82,24 +83,154 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rates_frame["tema21"] = ta.tema(rates_frame["close"],length=21)
-    currentTEMA21             = rates_frame["tema21"].iloc[-1]
-    previousTEMA21            = rates_frame["tema21"].iloc[-2]
+    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
+    rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
+    #####################################################################################################
+    # CURRENT STATE
+    #####################################################################################################
+    
+    tenkanSen_0                               =  ichimokuValues[0]["ITS_9"].iloc[-1]      
+    kijunSen_0                                =  ichimokuValues[0]["IKS_26"].iloc[-1]     
+    senkouSpanA_0                             =  ichimokuValues[0]["ISA_9"].iloc[-1]      
+    senkouSpanB_0                             =  ichimokuValues[0]["ISB_26"].iloc[-1]
+    candleClose_0                             =  rates_frame["close"].iloc[-1]
+    
+    chikouSpan_L26                            =  ichimokuValues[0]["ICS_26"].iloc[-27]
+    tenkanSen_L26                             =  ichimokuValues[0]["ITS_9"].iloc[-27]      
+    kijunSen_L26                              =  ichimokuValues[0]["IKS_26"].iloc[-27]     
+    senkouSpanA_L26                           =  ichimokuValues[0]["ISA_9"].iloc[-27]      
+    senkouSpanB_L26                           =  ichimokuValues[0]["ISB_26"].iloc[-27]
+    candleOpen_L26                            =  rates_frame["open"].iloc[-27]
+    candleClose_L26                           =  rates_frame["close"].iloc[-27]
+
+    
+    senkouSpanA_R26                           =  ichimokuValues[1]["ISA_9"].iloc[-1]      
+    senkouSpanB_R26                           =  ichimokuValues[1]["ISB_26"].iloc[-1]
+    
+    currentRSI26                              =  rates_frame.iloc[-1].rsi26
+    
+    #####################################################################################################
+    # PREVIOUS STATE
+    #####################################################################################################
+    
+    tenkanSen_L1                              =  ichimokuValues[0]["ITS_9"].iloc[-2]      
+    kijunSen_L1                               =  ichimokuValues[0]["IKS_26"].iloc[-2]     
+    senkouSpanA_L1                            =  ichimokuValues[0]["ISA_9"].iloc[-2]      
+    senkouSpanB_L1                            =  ichimokuValues[0]["ISB_26"].iloc[-2]
+    candleClose_L1                            =  rates_frame["close"].iloc[-2]
+    
+    chikouSpan_L27                            =  ichimokuValues[0]["ICS_26"].iloc[-28]
+    tenkanSen_L27                             =  ichimokuValues[0]["ITS_9"].iloc[-28]      
+    kijunSen_L27                              =  ichimokuValues[0]["IKS_26"].iloc[-28]     
+    senkouSpanA_L27                           =  ichimokuValues[0]["ISA_9"].iloc[-28]      
+    senkouSpanB_L27                           =  ichimokuValues[0]["ISB_26"].iloc[-28]
+    candleOpen_L27                            =  rates_frame["open"].iloc[-28]
+    candleClose_L27                           =  rates_frame["close"].iloc[-28]
+    
+    senkouSpanA_R25                           =  ichimokuValues[1]["ISA_9"].iloc[-2]      
+    senkouSpanB_R25                           =  ichimokuValues[1]["ISB_26"].iloc[-2]
+    
+    previousRSI26                             =  rates_frame.iloc[-2].rsi26
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if(currentTEMA21>previousTEMA21):
-        Signals.append("[BUY " + strTimeframe + "]")
-                
+    previousBuyCondition =  (candleClose_L1   >  tenkanSen_L1    and
+                             tenkanSen_L1     >  kijunSen_L1     and
+                             kijunSen_L1      >  senkouSpanA_L1  and
+                             kijunSen_L1      >  senkouSpanB_L1  and
+                            
+                             chikouSpan_L27   >  tenkanSen_L27   and
+                             chikouSpan_L27   >  kijunSen_L27    and
+                             chikouSpan_L27   >  senkouSpanA_L27 and
+                             chikouSpan_L27   >  senkouSpanB_L27 and
+                             chikouSpan_L27   >  candleOpen_L27  and
+                             chikouSpan_L27   >  candleClose_L27 and
+                             senkouSpanA_R25  >  senkouSpanB_R25 and
+                             previousRSI26    >  50)
+    
+    # Previous Top Line of Sight between Chikou Span and current candle close
+    previousTopLOS       = ((chikouSpan_L27   >  rates_frame["open"].iloc[-27:-3]).all() and
+                            (chikouSpan_L27   >  rates_frame["close"].iloc[-27:-3]).all())
+    
+    
+    currentBuyCondition  =  (candleClose_0    >  tenkanSen_0     and
+                             tenkanSen_0      >  kijunSen_0      and
+                             kijunSen_0       >  senkouSpanA_0   and
+                             kijunSen_0       >  senkouSpanB_0   and
+                            
+                             chikouSpan_L26   >  tenkanSen_L26   and
+                             chikouSpan_L26   >  kijunSen_L26    and
+                             chikouSpan_L26   >  senkouSpanA_L26 and
+                             chikouSpan_L26   >  senkouSpanB_L26 and
+                             chikouSpan_L26   >  candleOpen_L26  and
+                             chikouSpan_L26   >  candleClose_L26 and
+                             senkouSpanA_R26  >  senkouSpanB_R26 and
+                             currentRSI26     >  50)
+    
+    # Current Top Line of Sight between Chikou Span and current candle close
+    currentTopLOS        = ((chikouSpan_L26   >  rates_frame["open"].iloc[-26:-2]).all()  and
+                            (chikouSpan_L26   >  rates_frame["close"].iloc[-26:-2]).all())
+    
+
+                            
+    if((previousBuyCondition and previousTopLOS == False) and (currentBuyCondition and currentTopLOS  == True)):
+        Signals.append("[BUY " + strTimeframe + " NOW]")
+        
+    elif(previousBuyCondition == True  and currentBuyCondition == True):
+        Signals.append("[BUY " + strTimeframe + "]")  
+        
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-    
-    if(currentTEMA21<previousTEMA21):
-        Signals.append("[SELL " + strTimeframe + "]")
 
+    previousSellCondition  = (candleClose_L1  <  tenkanSen_L1    and
+                              tenkanSen_L1    <  kijunSen_L1     and
+                              kijunSen_L1     <  senkouSpanA_L1  and
+                              kijunSen_L1     <  senkouSpanB_L1  and
+                              
+                              chikouSpan_L27  <  tenkanSen_L27   and
+                              chikouSpan_L27  <  kijunSen_L27    and
+                              chikouSpan_L27  <  senkouSpanA_L27 and
+                              chikouSpan_L27  <  senkouSpanB_L27 and
+                              chikouSpan_L27  <  candleOpen_L27  and
+                              chikouSpan_L27  <  candleClose_L27 and
+                              senkouSpanA_R25 <  senkouSpanB_R25 and
+                              previousRSI26   <  50)
+    
+    # Previous Bottom Line of Sight between Chikou Span and current candle close
+    previousBottomLOS     = ((chikouSpan_L27  <  rates_frame["open"].iloc[-27:-3]).all() and
+                            (chikouSpan_L27   <  rates_frame["close"].iloc[-27:-3]).all())
+    
+    
+    currentSellCondition  = (candleClose_0    <  tenkanSen_0     and
+                             tenkanSen_0      <  kijunSen_0      and
+                             kijunSen_0       <  senkouSpanA_0   and
+                             kijunSen_0       <  senkouSpanB_0   and
+         
+                             chikouSpan_L26   <  tenkanSen_L26   and
+                             chikouSpan_L26   <  kijunSen_L26    and
+                             chikouSpan_L26   <  senkouSpanA_L26 and
+                             chikouSpan_L26   <  senkouSpanB_L26 and
+                             chikouSpan_L26   <  candleOpen_L26  and
+                             chikouSpan_L26   <  candleClose_L26 and
+                             senkouSpanA_R26  <  senkouSpanB_R26 and
+                             currentRSI26     <  50)
+    
+    # Current Bottom Line of Sight between Chikou Span and current candle close
+    currentBottomLOS      = ((chikouSpan_L26  <  rates_frame["open"].iloc[-26:-2]).all()  and
+                            (chikouSpan_L26   <  rates_frame["close"].iloc[-26:-2]).all())
+    
+
+    if((previousSellCondition and previousBottomLOS == False) and (currentSellCondition and currentBottomLOS  == True)):
+        Signals.append("[SELL " + strTimeframe + " NOW]")
+    
+    elif(previousSellCondition == True  and currentSellCondition == True):
+        Signals.append("[SELL " + strTimeframe + "]")
+        
+
+                  
 ##########################################################################################
 
 
@@ -133,23 +264,13 @@ while(True):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
-        sameSignals = []
-        if(len(Signals)>0):   
-            if(Signals[0]=="[BUY M1]"):
-                for i in Signals:
-                    if("BUY" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-            elif(Signals[0]=="[SELL M1]"):
-                for i in Signals:
-                    if("SELL" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-                        
-            display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-            winsound.Beep(freq, duration)
+        if(len(Signals)>0):
+            if(any(["NOW" in item for item in Signals])):
+                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n"+" ".join(Signals)+"\n"
+                winsound.Beep(freq1, duration)
+            else:
+                display+="*******************************************\n"+" ".join(Signals)+"\n"
+                winsound.Beep(freq2, duration)
                 
         display+="==============================\n"
     print(display)
