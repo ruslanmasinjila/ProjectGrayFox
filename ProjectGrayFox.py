@@ -91,14 +91,14 @@ def getSignals(rates_frame,strTimeframe):
     #####################################################################################################
     
     if(currentTEMA21>previousTEMA21):
-        Signals.append("[BUY " + strTimeframe + "]")
+        Signals.append("BUY")
                 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(currentTEMA21<previousTEMA21):
-        Signals.append("[SELL " + strTimeframe + "]")
+        Signals.append("SELL")
 
 ##########################################################################################
 
@@ -132,24 +132,11 @@ while(True):
         for t in range(len(mt5Timeframe)):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
-            
-        sameSignals = []
-        if(len(Signals)>0):   
-            if(Signals[0]=="[BUY M1]"):
-                for i in Signals:
-                    if("BUY" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-            elif(Signals[0]=="[SELL M1]"):
-                for i in Signals:
-                    if("SELL" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-                        
-            display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-            winsound.Beep(freq, duration)
+
+        if(len(Signals)==len(mt5Timeframe)):  
+            if(all("SELL" in item for item in Signals) or all("BUY" in item for item in Signals)):
+                display+="***************************************************  "+ " ".join(Signals[0])+"\n"
+                winsound.Beep(freq, duration)
                 
         display+="==============================\n"
     print(display)
