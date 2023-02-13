@@ -18,7 +18,8 @@ import os
 
 import winsound
 duration  = 50
-freq      = 1500
+freq1     = 2000
+freq2     = 1500
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -69,8 +70,8 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
-numCandles     = 50
-offset         = 1
+numCandles     = 200
+offset         = 0
 
 Signals   = []
 
@@ -82,32 +83,43 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rates_frame["sma21"]     = ta.sma(rates_frame["close"],length=21)
-    rates_frame["rsi21"]     = ta.rsi(rates_frame["close"],length=21)
+    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
+    rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
     
+    currentTenkanSen                          =  ichimokuValues[0]["ITS_9"].iloc[-1]      
+    currentKijunSen                           =  ichimokuValues[0]["IKS_26"].iloc[-1]  
+    currentRSI26                              =  rates_frame.iloc[-1].rsi26
+
+    futureSenkouSpanA                         =  ichimokuValues[1]["ISA_9"].iloc[-1]      
+    futureSenkouSpanB                         =  ichimokuValues[1]["ISB_26"].iloc[-1]
     
-    currentSMA21             = rates_frame["sma21"].iloc[-1]
-    currentRSI21             = rates_frame["rsi21"].iloc[-1]
-    
-    previousSMA21            = rates_frame["sma21"].iloc[-2]
-    previousRSI21            = rates_frame["rsi21"].iloc[-2]
+
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if(currentSMA21>previousSMA21):
-        if(previousRSI21 > 50 and currentRSI21 > 50):
-            Signals.append("[BUY " + strTimeframe + "]")
-                
+    if(currentTenkanSen > currentKijunSen):
+        if(currentRSI26 > 50):
+            if(futureSenkouSpanA   >   futureSenkouSpanB):
+                Signals.append("[BUY " + strTimeframe + "]")
+            elif(futureSenkouSpanA < futureSenkouSpanB ):
+                Signals.append("[BUY " + strTimeframe + " NOW]")
+          
+        
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-    
-    if(currentSMA21<previousSMA21):
-        if(previousRSI21 < 50 and currentRSI21 < 50):
-            Signals.append("[SELL " + strTimeframe + "]")
 
+    if(currentTenkanSen < currentKijunSen):
+        if(currentRSI26 < 50):
+            if(futureSenkouSpanA   <   futureSenkouSpanB):
+                Signals.append("[SELL " + strTimeframe + "]")
+            elif(futureSenkouSpanA > futureSenkouSpanB ):
+                Signals.append("[SELL " + strTimeframe + " NOW]")
+        
+
+                  
 ##########################################################################################
 
 
@@ -155,9 +167,14 @@ while(True):
                         sameSignals.append(i)
                     else:
                         break
-            if(len(sameSignals)>0):         
-                display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                winsound.Beep(freq, duration)
+            if(len(sameSignals)>0):
+                if(any(["NOW" in item for item in sameSignals])):
+                    display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+                    winsound.Beep(freq1, duration)
+                else:
+                    display+="************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+                    winsound.Beep(freq2, duration)
+                    
                 
         display+="==============================\n"
     print(display)
