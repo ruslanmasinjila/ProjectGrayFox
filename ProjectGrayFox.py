@@ -18,8 +18,7 @@ import os
 
 import winsound
 duration  = 50
-freq1     = 2000
-freq2     = 1500
+freq      = 1500
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -71,8 +70,7 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
 numCandles     = 200
-senkouShift    = 3
-offset         = 1
+offset         = 0
 
 Signals   = []
 
@@ -84,77 +82,25 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
-    #####################################################################################################
-    # CURRENT STATE
-    #####################################################################################################
-    
-    currentSenkouSpanA                        =  ichimokuValues[0]["ISA_9"].iloc[-1]      
-    currentSenkouSpanB                        =  ichimokuValues[0]["ISB_26"].iloc[-1]
-    currentCandleHigh                         =  rates_frame["high"].iloc[-1]
-    currentCandleLow                          =  rates_frame["low"].iloc[-1]
-    
-    currentFuturesenkouSpanA                  =  ichimokuValues[1]["ISA_9"].iloc[-senkouShift:]      
-    currentFutureSenkouSpanB                  =  ichimokuValues[1]["ISB_26"].iloc[-senkouShift:]
-    
-    currentRSI26                              =  rates_frame["rsi26"].iloc[-1]
-    
-    #####################################################################################################
-    # PREVIOUS STATE
-    #####################################################################################################
-       
-    previousSenkouSpanA                       =  ichimokuValues[0]["ISA_9"].iloc[-2]      
-    previousSenkouSpanB                       =  ichimokuValues[0]["ISB_26"].iloc[-2]
-    previousCandleHigh                        =  rates_frame["high"].iloc[-2]
-    previousCandleLow                         =  rates_frame["low"].iloc[-2]
-    
-    previousFuturesenkouSpanA                 =  ichimokuValues[1]["ISA_9"].iloc[-(senkouShift+1):-1]      
-    previousFutureSenkouSpanB                 =  ichimokuValues[1]["ISB_26"].iloc[-(senkouShift+1):-1]
-    
-    previousRSI26                             =  rates_frame["rsi26"].iloc[-2]
+    rates_frame["tema21"] = ta.tema(rates_frame["close"],length=21)
+    currentTEMA21             = rates_frame["tema21"].iloc[-1]
+    previousTEMA21            = rates_frame["tema21"].iloc[-2]
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    previousBuyCondition =  ((previousFuturesenkouSpanA   >  previousFutureSenkouSpanB).all() and
-                              previousCandleLow           >  previousSenkouSpanA              and
-                              previousCandleLow           >  previousSenkouSpanB              and
-                              previousRSI26               >  50)
-    
-    
-    currentBuyCondition  =  ((currentFuturesenkouSpanA    >  currentFutureSenkouSpanB).all()  and
-                              currentCandleLow            >  currentSenkouSpanA               and
-                              currentCandleLow            >  currentSenkouSpanB               and
-                              currentRSI26                >  50)
-                           
-    if((previousBuyCondition == False) and (currentBuyCondition == True)):
-        Signals.append("[BUY " + strTimeframe + " NOW]")
-        
-    elif(previousBuyCondition == True  and currentBuyCondition == True):
-        Signals.append("[BUY " + strTimeframe + "]")  
-        
+    if(currentTEMA21>previousTEMA21):
+        Signals.append("[BUY " + strTimeframe + "]")
+                
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
-    previousSellCondition = ((previousFuturesenkouSpanA   <  previousFutureSenkouSpanB).all() and
-                              previousCandleHigh          <  previousSenkouSpanA              and
-                              previousCandleHigh          <  previousSenkouSpanB              and
-                              previousRSI26               <  50)
-    
-    
-    currentSellCondition  = ((currentFuturesenkouSpanA    <  currentFutureSenkouSpanB).all()  and
-                              currentCandleHigh           <  currentSenkouSpanA               and
-                              currentCandleHigh           <  currentSenkouSpanB               and
-                              currentRSI26                <  50)
-                           
-    if((previousSellCondition == False) and (currentSellCondition == True)):
-        Signals.append("[SELL " + strTimeframe + " NOW]")
-        
-    elif(previousSellCondition == True  and currentSellCondition == True):
-        Signals.append("[SELL " + strTimeframe + "]")  
+    if(currentTEMA21<previousTEMA21):
+        Signals.append("[SELL " + strTimeframe + "]")
+
+##########################################################################################
 
 
 # In[ ]:
@@ -189,30 +135,25 @@ while(True):
             
         sameSignals = []
         if(len(Signals)>0):   
-            if(Signals[0]=="[BUY M1]" or Signals[0]=="[BUY M1 NOW]"):
+            if(Signals[0]=="[BUY M1]"):
                 for i in Signals:
                     if("BUY" in i):
                         sameSignals.append(i)
                     else:
                         break
-            elif(Signals[0]=="[SELL M1]" or Signals[0]=="[SELL M1 NOW]"):
+            elif(Signals[0]=="[SELL M1]"):
                 for i in Signals:
                     if("SELL" in i):
                         sameSignals.append(i)
                     else:
                         break
-            if(len(sameSignals)>0):
-                if(any(["NOW" in item for item in sameSignals])):
-                    display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                    winsound.Beep(freq1, duration)
-                else:
-                    display+="************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                    winsound.Beep(freq2, duration)
-                    
+                        
+            display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+            winsound.Beep(freq, duration)
                 
         display+="==============================\n"
     print(display)
-    time.sleep(60)
+    time.sleep(5)
     os.system('cls' if os.name == 'nt' else 'clear')
     
 ##########################################################################################
