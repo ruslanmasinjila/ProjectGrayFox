@@ -71,7 +71,8 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
 numCandles     = 200
-offset         = 0
+senkouShift    = 3
+offset         = 1
 
 Signals   = []
 
@@ -85,42 +86,75 @@ def getSignals(rates_frame,strTimeframe):
     
     ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
     rates_frame["rsi26"]                      =  ta.rsi(rates_frame["close"],length=26)
+    #####################################################################################################
+    # CURRENT STATE
+    #####################################################################################################
     
-    currentTenkanSen                          =  ichimokuValues[0]["ITS_9"].iloc[-1]      
-    currentKijunSen                           =  ichimokuValues[0]["IKS_26"].iloc[-1]  
-    currentRSI26                              =  rates_frame.iloc[-1].rsi26
-
-    futureSenkouSpanA                         =  ichimokuValues[1]["ISA_9"].iloc[-1]      
-    futureSenkouSpanB                         =  ichimokuValues[1]["ISB_26"].iloc[-1]
+    currentSenkouSpanA                        =  ichimokuValues[0]["ISA_9"].iloc[-1]      
+    currentSenkouSpanB                        =  ichimokuValues[0]["ISB_26"].iloc[-1]
+    currentCandleHigh                         =  rates_frame["high"].iloc[-1]
+    currentCandleLow                          =  rates_frame["low"].iloc[-1]
     
-
+    currentFuturesenkouSpanA                  =  ichimokuValues[1]["ISA_9"].iloc[-senkouShift:]      
+    currentFutureSenkouSpanB                  =  ichimokuValues[1]["ISB_26"].iloc[-senkouShift:]
+    
+    currentRSI26                              =  rates_frame["rsi26"].iloc[-1]
+    
+    #####################################################################################################
+    # PREVIOUS STATE
+    #####################################################################################################
+       
+    previousSenkouSpanA                       =  ichimokuValues[0]["ISA_9"].iloc[-2]      
+    previousSenkouSpanB                       =  ichimokuValues[0]["ISB_26"].iloc[-2]
+    previousCandleHigh                        =  rates_frame["high"].iloc[-2]
+    previousCandleLow                         =  rates_frame["low"].iloc[-2]
+    
+    previousFuturesenkouSpanA                 =  ichimokuValues[1]["ISA_9"].iloc[-(senkouShift+1):-1]      
+    previousFutureSenkouSpanB                 =  ichimokuValues[1]["ISB_26"].iloc[-(senkouShift+1):-1]
+    
+    previousRSI26                             =  rates_frame["rsi26"].iloc[-2]
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if(currentTenkanSen > currentKijunSen):
-        if(currentRSI26 > 50):
-            if(futureSenkouSpanA   >   futureSenkouSpanB):
-                Signals.append("[BUY " + strTimeframe + "]")
-            elif(futureSenkouSpanA < futureSenkouSpanB ):
-                Signals.append("[BUY " + strTimeframe + " NOW]")
-          
+    previousBuyCondition =  ((previousFuturesenkouSpanA   >  previousFutureSenkouSpanB).all() and
+                              previousCandleLow           >  previousSenkouSpanA              and
+                              previousCandleLow           >  previousSenkouSpanB              and
+                              previousRSI26               >  50)
+    
+    
+    currentBuyCondition  =  ((currentFuturesenkouSpanA    >  currentFutureSenkouSpanB).all()  and
+                              currentCandleLow            >  currentSenkouSpanA               and
+                              currentCandleLow            >  currentSenkouSpanB               and
+                              currentRSI26                >  50)
+                           
+    if((previousBuyCondition == False) and (currentBuyCondition == True)):
+        Signals.append("[BUY " + strTimeframe + " NOW]")
+        
+    elif(previousBuyCondition == True  and currentBuyCondition == True):
+        Signals.append("[BUY " + strTimeframe + "]")  
         
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-
-    if(currentTenkanSen < currentKijunSen):
-        if(currentRSI26 < 50):
-            if(futureSenkouSpanA   <   futureSenkouSpanB):
-                Signals.append("[SELL " + strTimeframe + "]")
-            elif(futureSenkouSpanA > futureSenkouSpanB ):
-                Signals.append("[SELL " + strTimeframe + " NOW]")
+    
+    previousSellCondition = ((previousFuturesenkouSpanA   <  previousFutureSenkouSpanB).all() and
+                              previousCandleHigh          <  previousSenkouSpanA              and
+                              previousCandleHigh          <  previousSenkouSpanB              and
+                              previousRSI26               <  50)
+    
+    
+    currentSellCondition  = ((currentFuturesenkouSpanA    <  currentFutureSenkouSpanB).all()  and
+                              currentCandleHigh           <  currentSenkouSpanA               and
+                              currentCandleHigh           <  currentSenkouSpanB               and
+                              currentRSI26                <  50)
+                           
+    if((previousSellCondition == False) and (currentSellCondition == True)):
+        Signals.append("[SELL " + strTimeframe + " NOW]")
         
-
-                  
-##########################################################################################
+    elif(previousSellCondition == True  and currentSellCondition == True):
+        Signals.append("[SELL " + strTimeframe + "]")  
 
 
 # In[ ]:
@@ -155,13 +189,13 @@ while(True):
             
         sameSignals = []
         if(len(Signals)>0):   
-            if(Signals[0]=="[BUY M1]"):
+            if(Signals[0]=="[BUY M1]" or Signals[0]=="[BUY M1 NOW]"):
                 for i in Signals:
                     if("BUY" in i):
                         sameSignals.append(i)
                     else:
                         break
-            elif(Signals[0]=="[SELL M1]"):
+            elif(Signals[0]=="[SELL M1]" or Signals[0]=="[SELL M1 NOW]"):
                 for i in Signals:
                     if("SELL" in i):
                         sameSignals.append(i)
