@@ -82,25 +82,20 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rates_frame["tema21"] = ta.tema(rates_frame["close"],length=21)
-    currentTEMA21             = rates_frame["tema21"].iloc[-1]
-    previousTEMA21            = rates_frame["tema21"].iloc[-2]
+    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
+    #####################################################################################################
+    # CURRENT STATE
+    #####################################################################################################
+
+    lastSenkouSpanA                           =  ichimokuValues[1]["ISA_9"].iloc[-1]      
+    lastSenkouSpanB                           =  ichimokuValues[1]["ISB_26"].iloc[-1]
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
-    
-    if(currentTEMA21>previousTEMA21):
-        Signals.append("[BUY " + strTimeframe + "]")
-                
-    #####################################################################################################
-    # SELL SIGNAL
-    #####################################################################################################
-    
-    if(currentTEMA21<previousTEMA21):
-        Signals.append("[SELL " + strTimeframe + "]")
 
-##########################################################################################
+    if(lastSenkouSpanA == lastSenkouSpanB):
+        Signals.append("[EQUAL " + strTimeframe + "]")
 
 
 # In[ ]:
@@ -133,24 +128,9 @@ while(True):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
-        sameSignals = []
-        if(len(Signals)>0):   
-            if(Signals[0]=="[BUY M1]"):
-                for i in Signals:
-                    if("BUY" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-            elif(Signals[0]=="[SELL M1]"):
-                for i in Signals:
-                    if("SELL" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-                        
-            display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-            winsound.Beep(freq, duration)
-                
+        if(len(Signals)>0):
+            display+="********************************************\n"+" ".join(Signals)+"\n"
+            winsound.Beep(freq, duration)   
         display+="==============================\n"
     print(display)
     time.sleep(60)
