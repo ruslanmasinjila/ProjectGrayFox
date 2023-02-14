@@ -70,7 +70,7 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
 
 numCandles     = 200
-offset         = 0
+offset         = 1
 
 Signals   = []
 
@@ -91,14 +91,14 @@ def getSignals(rates_frame,strTimeframe):
     #####################################################################################################
     
     if(currentTEMA21>previousTEMA21):
-        Signals.append("BUY")
+        Signals.append("[BUY " + strTimeframe + "]")
                 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(currentTEMA21<previousTEMA21):
-        Signals.append("SELL")
+        Signals.append("[SELL " + strTimeframe + "]")
 
 ##########################################################################################
 
@@ -132,15 +132,28 @@ while(True):
         for t in range(len(mt5Timeframe)):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
-
-        if(len(Signals)==len(mt5Timeframe)):  
-            if(all("SELL" in item for item in Signals) or all("BUY" in item for item in Signals)):
-                display+="***************************************************  "+ " ".join(Signals[0])+"\n"
-                winsound.Beep(freq, duration)
+            
+        sameSignals = []
+        if(len(Signals)>0):   
+            if(Signals[0]=="[BUY M1]"):
+                for i in Signals:
+                    if("BUY" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+            elif(Signals[0]=="[SELL M1]"):
+                for i in Signals:
+                    if("SELL" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+                        
+            display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+            winsound.Beep(freq, duration)
                 
         display+="==============================\n"
     print(display)
-    time.sleep(5)
+    time.sleep(60)
     os.system('cls' if os.name == 'nt' else 'clear')
     
 ##########################################################################################
