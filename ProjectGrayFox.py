@@ -66,10 +66,10 @@ with open('instruments.txt') as f:
 
 
 # TIMEFRAMES
-mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1]
-strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1"]
+mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1,W1,MN1]
+strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
-numCandles     = 200
+numCandles     = 3
 offset         = 1
 
 Signals   = []
@@ -82,20 +82,48 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    ichimokuValues                            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"]) # returns ichimokudf, spandf
-    #####################################################################################################
-    # CURRENT STATE
-    #####################################################################################################
-
-    lastSenkouSpanA                           =  ichimokuValues[1]["ISA_9"].iloc[-1]      
-    lastSenkouSpanB                           =  ichimokuValues[1]["ISB_26"].iloc[-1]
+    rightOpen                =      rates_frame["open"].iloc[-1]
+    rightHigh                =      rates_frame["high"].iloc[-1]
+    rightLow                 =      rates_frame["low"].iloc[-1]
+    rightClose               =      rates_frame["close"].iloc[-1]
+    rightSize                =      abs(rightClose - rightOpen)
+    rightIsGreen             =      (rightClose > rightOpen)
+    rightIsRed               =      (rightClose < rightOpen)
+    
+    middleOpen               =      rates_frame["open"].iloc[-2]
+    middleHigh               =      rates_frame["high"].iloc[-2]
+    middleLow                =      rates_frame["low"].iloc[-2]
+    middleClose              =      rates_frame["close"].iloc[-2]
+    middleSize               =      abs(middleClose - middleOpen)
+    middleIsGreen            =      (middleClose > middleOpen)
+    middleIsRed              =      (middleClose < middleOpen)
+    
+    leftOpen                 =      rates_frame["open"].iloc[-3]
+    leftHigh                 =      rates_frame["high"].iloc[-3]
+    leftLow                  =      rates_frame["low"].iloc[-3]
+    leftClose                =      rates_frame["close"].iloc[-3]
+    leftSize                 =      abs(leftClose - leftOpen)
+    leftIsGreen              =      (leftClose > leftOpen)
+    leftIsRed                =      (leftClose < leftOpen)
+    
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
+    
+    if(leftIsGreen and middleIsRed and rightIsGreen):
+        Signals.append("[BUY " + strTimeframe + "]")
 
-    if(lastSenkouSpanA == lastSenkouSpanB):
-        Signals.append("[EQUAL " + strTimeframe + "]")
+    #####################################################################################################
+    # SELL SIGNAL
+    #####################################################################################################
+    
+    if(leftIsRed and middleIsGreen and rightIsRed):
+        Signals.append("[SELL " + strTimeframe + "]")
+    
+
+
+##########################################################################################
 
 
 # In[ ]:
@@ -128,9 +156,25 @@ while(True):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
-        if(len(Signals)>0):
-            display+="********************************************\n"+" ".join(Signals)+"\n"
-            winsound.Beep(freq, duration)   
+        sameSignals = []
+        if(len(Signals)>0):   
+            if("BUY" in Signals[0]):
+                for i in Signals:
+                    if("BUY" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+            elif("SELL" in Signals[0]):
+                for i in Signals:
+                    if("SELL" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+                 
+            if(len(sameSignals)>0):
+                display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+                winsound.Beep(freq, duration)
+                
         display+="==============================\n"
     print(display)
     time.sleep(60)
