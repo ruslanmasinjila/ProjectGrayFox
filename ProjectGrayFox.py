@@ -82,44 +82,46 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rightOpen                =      rates_frame["open"].iloc[-1]
-    rightHigh                =      rates_frame["high"].iloc[-1]
-    rightLow                 =      rates_frame["low"].iloc[-1]
-    rightClose               =      rates_frame["close"].iloc[-1]
-    rightSize                =      abs(rightClose - rightOpen)
-    rightIsGreen             =      (rightClose > rightOpen)
-    rightIsRed               =      (rightClose < rightOpen)
+    firstOpen                =      rates_frame["open"].iloc[-1]
+    firstHigh                =      rates_frame["high"].iloc[-1]
+    firstLow                 =      rates_frame["low"].iloc[-1]
+    firstClose               =      rates_frame["close"].iloc[-1]
+    firstSize                =      abs(firstClose - firstOpen)
+    firstIsGreen             =      (firstClose > firstOpen)
+    firstIsRed               =      (firstClose < firstOpen)
     
-    middleOpen               =      rates_frame["open"].iloc[-2]
-    middleHigh               =      rates_frame["high"].iloc[-2]
-    middleLow                =      rates_frame["low"].iloc[-2]
-    middleClose              =      rates_frame["close"].iloc[-2]
-    middleSize               =      abs(middleClose - middleOpen)
-    middleIsGreen            =      (middleClose > middleOpen)
-    middleIsRed              =      (middleClose < middleOpen)
+    secondOpen               =      rates_frame["open"].iloc[-2]
+    secondHigh               =      rates_frame["high"].iloc[-2]
+    secondLow                =      rates_frame["low"].iloc[-2]
+    secondClose              =      rates_frame["close"].iloc[-2]
+    secondSize               =      abs(secondClose - secondOpen)
+    secondIsGreen            =      (secondClose > secondOpen)
+    secondIsRed              =      (secondClose < secondOpen)
     
-    leftOpen                 =      rates_frame["open"].iloc[-3]
-    leftHigh                 =      rates_frame["high"].iloc[-3]
-    leftLow                  =      rates_frame["low"].iloc[-3]
-    leftClose                =      rates_frame["close"].iloc[-3]
-    leftSize                 =      abs(leftClose - leftOpen)
-    leftIsGreen              =      (leftClose > leftOpen)
-    leftIsRed                =      (leftClose < leftOpen)
+    thirdOpen                 =      rates_frame["open"].iloc[-3]
+    thirdHigh                 =      rates_frame["high"].iloc[-3]
+    thirdLow                  =      rates_frame["low"].iloc[-3]
+    thirdClose                =      rates_frame["close"].iloc[-3]
+    thirdSize                 =      abs(thirdClose - thirdOpen)
+    thirdIsGreen              =      (thirdClose > thirdOpen)
+    thirdIsRed                =      (thirdClose < thirdOpen)
     
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if(leftIsGreen and middleIsRed and rightIsGreen):
-        Signals.append("[BUY " + strTimeframe + "]")
+    if(thirdIsGreen and secondIsRed and firstIsGreen):
+        if(firstSize > secondSize):
+            Signals.append("[BUY " + strTimeframe + "]")
 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
-    if(leftIsRed and middleIsGreen and rightIsRed):
-        Signals.append("[SELL " + strTimeframe + "]")
+    if(thirdIsRed and secondIsGreen and firstIsRed):
+        if(firstSize > secondSize):
+            Signals.append("[SELL " + strTimeframe + "]")
     
 
 
