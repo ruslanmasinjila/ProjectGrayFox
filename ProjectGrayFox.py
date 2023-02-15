@@ -69,7 +69,7 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1,W1,MN1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
-numCandles     = 3
+numCandles     = 6
 offset         = 1
 
 Signals   = []
@@ -112,19 +112,19 @@ def getSignals(rates_frame,strTimeframe):
     #####################################################################################################
     
     if(thirdIsGreen and secondIsRed and firstIsGreen):
-        if(firstSize > secondSize):
-            Signals.append("[BUY " + strTimeframe + "]")
+        if(thirdLow  < secondLow and secondLow < firstLow):
+            if(firstSize > secondSize):
+                Signals.append("[BUY " + strTimeframe + "]")
 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(thirdIsRed and secondIsGreen and firstIsRed):
-        if(firstSize > secondSize):
-            Signals.append("[SELL " + strTimeframe + "]")
+        if(thirdHigh > secondHigh and secondHigh > firstHigh):
+            if(firstSize > secondSize):
+                Signals.append("[SELL " + strTimeframe + "]")
     
-
-
 ##########################################################################################
 
 
@@ -174,7 +174,9 @@ while(True):
                         break
                  
             if(len(sameSignals)>0):
-                display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+                display+=("*************************************************** \n"  + 
+                          "Consecutive Signals: " + " ".join(sameSignals) +   "\n"  +
+                          "All Signals        : " + " ".join(Signals)     +   "\n")
                 winsound.Beep(freq, duration)
                 
         display+="==============================\n"
