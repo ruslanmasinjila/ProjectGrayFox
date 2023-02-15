@@ -112,16 +112,14 @@ def getSignals(rates_frame,strTimeframe):
     #####################################################################################################
     
     if(leftIsGreen and middleIsRed and rightIsGreen):
-        if(rightSize > middleSize):
-            Signals.append("[BUY " + strTimeframe + "]")
+        Signals.append("[BUY " + strTimeframe + "]")
 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(leftIsRed and middleIsGreen and rightIsRed):
-        if(rightSize > middleSize):
-            Signals.append("[SELL " + strTimeframe + "]")
+        Signals.append("[SELL " + strTimeframe + "]")
     
 
 
