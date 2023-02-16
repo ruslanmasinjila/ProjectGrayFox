@@ -106,20 +106,29 @@ def getSignals(rates_frame,strTimeframe):
     thirdIsGreen             =      (thirdClose > thirdOpen)
     thirdIsRed               =      (thirdClose < thirdOpen)
     
+    fourthOpen               =      rates_frame["open"].iloc[-4]
+    fourthHigh               =      rates_frame["high"].iloc[-4]
+    fourthLow                =      rates_frame["low"].iloc[-4]
+    fourthClose              =      rates_frame["close"].iloc[-4]
+    fourthSize               =      abs(fourthClose - fourthOpen)
+    fourthIsGreen            =      (fourthClose > fourthOpen)
+    fourthIsRed              =      (fourthClose < fourthOpen)
+    
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if(thirdIsGreen and secondIsRed and firstIsGreen):
-        Signals.append("[BUY " + strTimeframe + "]")
+    if(fourthIsGreen and thirdIsGreen and secondIsRed and firstIsGreen):
+        if(firstClose > secondHigh and firstClose > thirdHigh and firstClose > fourthHigh):
+            Signals.append("[BUY " + strTimeframe + "]")
 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-    
-    if(thirdIsRed and secondIsGreen and firstIsRed):
-        Signals.append("[SELL " + strTimeframe + "]")
+    if(fourthIsRed and thirdIsRed and secondIsGreen and firstIsRed):
+        if(firstClose < secondLow and firstClose < thirdLow and firstClose < fourthLow):
+            Signals.append("[SELL " + strTimeframe + "]")
     
 ##########################################################################################
 
@@ -147,7 +156,6 @@ while(True):
     
     display = banner
     for cp in currency_pairs:
-        display+="["+cp+"]"+"\n"
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
@@ -155,12 +163,7 @@ while(True):
             getSignals(rates_frame,strTimeframe[t])
             
         if(len(Signals)>0):
-            if(any(["NOW" in item for item in Signals])):
-                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n"+" ".join(Signals)+"\n"
-                winsound.Beep(freq, duration)
-            else:
-                display+="********************************************** \n"+" ".join(Signals)+"\n"
-        display+="==============================\n"
+            display+="["+cp+"]: "+ "******** "+" ".join(Signals)+"\n"
     print(display)
     input("Press Enter to continue... ")
     os.system('cls' if os.name == 'nt' else 'clear')
