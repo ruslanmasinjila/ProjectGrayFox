@@ -177,6 +177,7 @@ while(True):
             
         if(len(Signals)>0):
             display+="["+cp+"]: "+ "******** "+" ".join(Signals)+"\n"
+            winsound.Beep(freq, duration) 
     print(display)
     time.sleep(60)
     os.system('cls' if os.name == 'nt' else 'clear')
