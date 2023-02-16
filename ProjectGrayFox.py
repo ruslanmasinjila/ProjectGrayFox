@@ -98,13 +98,13 @@ def getSignals(rates_frame,strTimeframe):
     secondIsGreen            =      (secondClose > secondOpen)
     secondIsRed              =      (secondClose < secondOpen)
     
-    thirdOpen                 =      rates_frame["open"].iloc[-3]
-    thirdHigh                 =      rates_frame["high"].iloc[-3]
-    thirdLow                  =      rates_frame["low"].iloc[-3]
-    thirdClose                =      rates_frame["close"].iloc[-3]
-    thirdSize                 =      abs(thirdClose - thirdOpen)
-    thirdIsGreen              =      (thirdClose > thirdOpen)
-    thirdIsRed                =      (thirdClose < thirdOpen)
+    thirdOpen                =      rates_frame["open"].iloc[-3]
+    thirdHigh                =      rates_frame["high"].iloc[-3]
+    thirdLow                 =      rates_frame["low"].iloc[-3]
+    thirdClose               =      rates_frame["close"].iloc[-3]
+    thirdSize                =      abs(thirdClose - thirdOpen)
+    thirdIsGreen             =      (thirdClose > thirdOpen)
+    thirdIsRed               =      (thirdClose < thirdOpen)
     
     
     #####################################################################################################
@@ -112,18 +112,14 @@ def getSignals(rates_frame,strTimeframe):
     #####################################################################################################
     
     if(thirdIsGreen and secondIsRed and firstIsGreen):
-        if(thirdLow  < secondLow and secondLow < firstLow):
-            if(firstSize > secondSize):
-                Signals.append("[BUY " + strTimeframe + "]")
+        Signals.append("[BUY " + strTimeframe + "]")
 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
     
     if(thirdIsRed and secondIsGreen and firstIsRed):
-        if(thirdHigh > secondHigh and secondHigh > firstHigh):
-            if(firstSize > secondSize):
-                Signals.append("[SELL " + strTimeframe + "]")
+        Signals.append("[SELL " + strTimeframe + "]")
     
 ##########################################################################################
 
@@ -158,30 +154,15 @@ while(True):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
-        sameSignals = []
-        if(len(Signals)>0):   
-            if("BUY" in Signals[0]):
-                for i in Signals:
-                    if("BUY" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-            elif("SELL" in Signals[0]):
-                for i in Signals:
-                    if("SELL" in i):
-                        sameSignals.append(i)
-                    else:
-                        break
-                 
-            if(len(sameSignals)>0):
-                display+=("*************************************************** \n"  + 
-                          "Consecutive Signals: " + " ".join(sameSignals) +   "\n"  +
-                          "All Signals        : " + " ".join(Signals)     +   "\n")
+        if(len(Signals)>0):
+            if(any(["NOW" in item for item in Signals])):
+                display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n"+" ".join(Signals)+"\n"
                 winsound.Beep(freq, duration)
-                
+            else:
+                display+="********************************************** \n"+" ".join(Signals)+"\n"
         display+="==============================\n"
     print(display)
-    time.sleep(60)
+    input("Press Enter to continue... ")
     os.system('cls' if os.name == 'nt' else 'clear')
     
 ##########################################################################################
