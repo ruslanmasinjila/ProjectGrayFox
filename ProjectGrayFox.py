@@ -114,21 +114,34 @@ def getSignals(rates_frame,strTimeframe):
     fourthIsGreen            =      (fourthClose > fourthOpen)
     fourthIsRed              =      (fourthClose < fourthOpen)
     
+    fifthOpen                =      rates_frame["open"].iloc[-5]
+    fifthHigh                =      rates_frame["high"].iloc[-5]
+    fifthLow                 =      rates_frame["low"].iloc[-5]
+    fifthClose               =      rates_frame["close"].iloc[-5]
+    fifthSize                =      abs(fifthClose - fifthOpen)
+    fifthIsGreen             =      (fifthClose  > fifthOpen)
+    fifthIsRed               =      (fifthClose < fifthOpen)
+    
     
     #####################################################################################################
     # BUY SIGNAL
     #####################################################################################################
     
-    if(fourthIsGreen and thirdIsGreen and secondIsRed and firstIsGreen):
-        if(firstClose > secondHigh and firstClose > thirdHigh and firstClose > fourthHigh):
-            Signals.append("[BUY " + strTimeframe + "]")
+    if(thirdIsRed):
+        if(fourthIsGreen and secondIsGreen):
+            if(thirdLow < firstLow and thirdLow < secondLow):
+                if(thirdLow < fourthLow and thirdLow < fifthLow):
+                    Signals.append("[BUY " + strTimeframe + "]")
 
     #####################################################################################################
     # SELL SIGNAL
     #####################################################################################################
-    if(fourthIsRed and thirdIsRed and secondIsGreen and firstIsRed):
-        if(firstClose < secondLow and firstClose < thirdLow and firstClose < fourthLow):
-            Signals.append("[SELL " + strTimeframe + "]")
+
+    if(thirdIsGreen):
+        if(fourthIsRed and secondIsRed):
+            if(thirdHigh > firstHigh and thirdHigh > secondHigh):
+                if(thirdHigh > fourthHigh and thirdHigh > fifthHigh):
+                    Signals.append("[SELL " + strTimeframe + "]")
     
 ##########################################################################################
 
@@ -165,7 +178,7 @@ while(True):
         if(len(Signals)>0):
             display+="["+cp+"]: "+ "******** "+" ".join(Signals)+"\n"
     print(display)
-    input("Press Enter to continue... ")
+    time.sleep(60)
     os.system('cls' if os.name == 'nt' else 'clear')
     
 ##########################################################################################
