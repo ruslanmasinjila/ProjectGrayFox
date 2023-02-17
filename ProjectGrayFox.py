@@ -122,15 +122,15 @@ def getSignals(rates_frame,strTimeframe):
     # BUY SIGNAL
     if(currentIsGreen):
         if(currentLow > previousLow):
-            if(currentHigh > previousHigh):
+            if(currentClose > previousHigh):
                 Signals.append("[BUY " + strTimeframe + "]")
 
 
             
     # SELL SIGNAL
     if(currentIsRed):
-        if(currentLow < previousLow):
-            if(currentHigh < previousHigh):
+        if(currentHigh < previousHigh):
+            if(currentClose < previousLow):
                 Signals.append("[SELL " + strTimeframe + "]")
 
                     
@@ -141,7 +141,7 @@ def getSignals(rates_frame,strTimeframe):
 
 
 # Gets the most recent <numCandles> prices for a specified <currency_pair> and <mt5Timeframe>
-def getRates(currency_pair, mt5Timeframe, numCandles):
+def getRates(currency_pair, mt5Timeframe, offset, numCandles):
     rates_frame =  mt5.copy_rates_from_pos(currency_pair, mt5Timeframe, offset, numCandles)
     rates_frame = pd.DataFrame(rates_frame)
     return rates_frame
@@ -164,12 +164,11 @@ while(True):
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
-            
-            offset      = 0
-            if(strTimeframe[t]=="M1"):
+            offset         = 0
+            if(strTimeframe[t] == "M1"):
                 offset = 1
                 
-            rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
+            rates_frame = getRates(cp, mt5Timeframe[t], offset, numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
         sameSignals = []
