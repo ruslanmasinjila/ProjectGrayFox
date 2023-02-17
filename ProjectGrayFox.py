@@ -109,8 +109,11 @@ def getSignals(rates_frame,strTimeframe):
             if(((currentOpen  < currentSenkouSpanA  or currentOpen  < currentSenkouSpanB)  and (currentClose  > currentSenkouSpanA  and currentClose  > currentSenkouSpanB)) or
                ((previousOpen < previousSenkouSpanA or previousOpen < previousSenkouSpanB) and (previousClose > previousSenkouSpanA and previousClose > previousSenkouSpanB))):
                 Signals.append("[BUY " + strTimeframe + " NOW]")
-            else:
+            elif(currentLow > currentSenkouSpanA and currentLow > currentSenkouSpanB):
                 Signals.append("[BUY " + strTimeframe + "]")
+            else:
+                Signals.append("==")
+                
 
     # SELL SIGNAL
     if(currentLow < previousLow and currentHigh < previousHigh):
@@ -118,8 +121,11 @@ def getSignals(rates_frame,strTimeframe):
             if(((currentOpen  > currentSenkouSpanA  or currentOpen  > currentSenkouSpanB)  and (currentClose  < currentSenkouSpanA  and currentClose  < currentSenkouSpanB)) or
                ((previousOpen > previousSenkouSpanA or previousOpen > previousSenkouSpanB) and (previousClose < previousSenkouSpanA and previousClose < previousSenkouSpanB))):
                 Signals.append("[SELL " + strTimeframe + " NOW]")
-            else:
+            elif(currentHigh < currentSenkouSpanA and currentHigh < currentSenkouSpanB):
                 Signals.append("[SELL " + strTimeframe + "]")
+            else:
+                Signals.append("==")
+                
 
                     
 ##########################################################################################
