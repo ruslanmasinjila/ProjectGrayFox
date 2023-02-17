@@ -70,7 +70,7 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
 numCandles     = 100
-offset         = 0
+
 Signals        = []
 
 ##########################################################################################
@@ -81,21 +81,21 @@ Signals        = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rates_frame["sma50"] = ta.sma(rates_frame["close"],length=50)
-    rates_frame["sma45"] = ta.sma(rates_frame["close"],length=45)
-    rates_frame["sma40"] = ta.sma(rates_frame["close"],length=40)
-    rates_frame["sma35"] = ta.sma(rates_frame["close"],length=35)
-    rates_frame["sma30"] = ta.sma(rates_frame["close"],length=30)
-    rates_frame["sma25"] = ta.sma(rates_frame["close"],length=25)
-    rates_frame["sma20"] = ta.sma(rates_frame["close"],length=20)
+    rates_frame["tema50"] = ta.tema(rates_frame["close"],length=50)
+    rates_frame["tema45"] = ta.tema(rates_frame["close"],length=45)
+    rates_frame["tema40"] = ta.tema(rates_frame["close"],length=40)
+    rates_frame["tema35"] = ta.tema(rates_frame["close"],length=35)
+    rates_frame["tema30"] = ta.tema(rates_frame["close"],length=30)
+    rates_frame["tema25"] = ta.tema(rates_frame["close"],length=25)
+    rates_frame["tema20"] = ta.tema(rates_frame["close"],length=20)
     
-    currentSMA50             = rates_frame["sma50"].iloc[-1]
-    currentSMA45             = rates_frame["sma45"].iloc[-1]
-    currentSMA40             = rates_frame["sma40"].iloc[-1]
-    currentSMA35             = rates_frame["sma35"].iloc[-1]
-    currentSMA30             = rates_frame["sma30"].iloc[-1]
-    currentSMA25             = rates_frame["sma25"].iloc[-1]
-    currentSMA20             = rates_frame["sma20"].iloc[-1]
+    currentTEMA50             = rates_frame["tema50"].iloc[-1]
+    currentTEMA45             = rates_frame["tema45"].iloc[-1]
+    currentTEMA40             = rates_frame["tema40"].iloc[-1]
+    currentTEMA35             = rates_frame["tema35"].iloc[-1]
+    currentTEMA30             = rates_frame["tema30"].iloc[-1]
+    currentTEMA25             = rates_frame["tema25"].iloc[-1]
+    currentTEMA20             = rates_frame["tema20"].iloc[-1]
     
     currentOpen               = rates_frame["open"].iloc[-1]
     currentClose              = rates_frame["close"].iloc[-1]
@@ -104,13 +104,13 @@ def getSignals(rates_frame,strTimeframe):
     currentIsGreen            = currentClose > currentOpen
     currentIsRed              = currentClose < currentOpen
     
-    previousSMA50            = rates_frame["sma50"].iloc[-2]
-    previousSMA45            = rates_frame["sma45"].iloc[-2]
-    previousSMA40            = rates_frame["sma40"].iloc[-2]
-    previousSMA35            = rates_frame["sma35"].iloc[-2]
-    previousSMA30            = rates_frame["sma30"].iloc[-2]
-    previousSMA25            = rates_frame["sma25"].iloc[-2]
-    previousSMA20            = rates_frame["sma20"].iloc[-2]
+    previousTEMA50            = rates_frame["tema50"].iloc[-2]
+    previousTEMA45            = rates_frame["tema45"].iloc[-2]
+    previousTEMA40            = rates_frame["tema40"].iloc[-2]
+    previousTEMA35            = rates_frame["tema35"].iloc[-2]
+    previousTEMA30            = rates_frame["tema30"].iloc[-2]
+    previousTEMA25            = rates_frame["tema25"].iloc[-2]
+    previousTEMA20            = rates_frame["tema20"].iloc[-2]
     
     previousOpen              = rates_frame["open"].iloc[-2]
     previousClose             = rates_frame["close"].iloc[-2]
@@ -120,47 +120,36 @@ def getSignals(rates_frame,strTimeframe):
     previousIsRed             = previousClose < previousOpen
     
     # BUY SIGNAL
-    if(previousSMA50 < currentSMA50 and 
-       previousSMA45 < currentSMA45 and
-       previousSMA40 < currentSMA40 and
-       previousSMA35 < currentSMA35 and
-       previousSMA30 < currentSMA30 and
-       previousSMA25 < currentSMA25 and
-       previousSMA20 < currentSMA20):
+    if(previousTEMA50 < currentTEMA50 and 
+       previousTEMA45 < currentTEMA45 and
+       previousTEMA40 < currentTEMA40 and
+       previousTEMA35 < currentTEMA35 and
+       previousTEMA30 < currentTEMA30 and
+       previousTEMA25 < currentTEMA25 and
+       previousTEMA20 < currentTEMA20):
         if(strTimeframe!="M1"):
-            Signals.append("[BUY " + strTimeframe + "]")
+            if(currentIsGreen):
+                Signals.append("[BUY " + strTimeframe + "]")
         else:
-            if(previousSMA50<previousSMA45 and
-               previousSMA45<previousSMA40 and
-               previousSMA40<previousSMA35 and
-               previousSMA35<previousSMA30 and
-               previousSMA30<previousSMA25 and
-               previousSMA25<previousSMA20):
-                if(previousIsGreen):
-                    if(previousLow < previousSMA20 and previousClose > previousSMA20):
-                        Signals.append("[BUY " + strTimeframe + "]")
+            if(currentIsGreen):
+                if(currentClose > previousHigh):
+                    Signals.append("[BUY " + strTimeframe + "]")
 
             
     # SELL SIGNAL
-    if(previousSMA50 > currentSMA50 and
-       previousSMA45 > currentSMA45 and
-       previousSMA40 > currentSMA40 and
-       previousSMA35 > currentSMA35 and
-       previousSMA30 > currentSMA30 and
-       previousSMA25 > currentSMA25 and
-       previousSMA20 > currentSMA20):
+    if(previousTEMA50 > currentTEMA50 and
+       previousTEMA45 > currentTEMA45 and
+       previousTEMA40 > currentTEMA40 and
+       previousTEMA35 > currentTEMA35 and
+       previousTEMA30 > currentTEMA30 and
+       previousTEMA25 > currentTEMA25 and
+       previousTEMA20 > currentTEMA20):
         if(strTimeframe!="M1"):
             Signals.append("[SELL " + strTimeframe + "]")
         else:
-            if(previousSMA50 > previousSMA45 and
-               previousSMA45 > previousSMA40 and
-               previousSMA40 > previousSMA35 and
-               previousSMA35 > previousSMA30 and
-               previousSMA30 > previousSMA25 and
-               previousSMA25 > previousSMA20):
-                if(previousIsRed):
-                    if(previousLow > previousSMA20 and previousClose < previousSMA20):
-                        Signals.append("[SELL " + strTimeframe + "]")
+            if(currentIsRed):
+                if(currentClose < previousLow):
+                    Signals.append("[SELL " + strTimeframe + "]")
                     
 ##########################################################################################
 
@@ -192,6 +181,11 @@ while(True):
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
+            
+            offset      = 0
+            
+            if(strTimeframe[t]=="M1"):
+                offset = 1
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
