@@ -126,9 +126,19 @@ def getSignals(rates_frame,strTimeframe):
        previousTEMA40 < currentTEMA40 and
        previousTEMA35 < currentTEMA35 and
        previousTEMA30 < currentTEMA30 and
-       previousTEMA25 < currentTEMA25):
-        Signals.append("[BUY " + strTimeframe + "]")
-
+       previousTEMA25 < currentTEMA25 and
+       previousTEMA20 < currentTEMA20):
+        if(strTimeframe!="M1"):
+            Signals.append("[BUY " + strTimeframe + "]")
+        else:
+            if(currentTEMA50<currentTEMA45 and
+               currentTEMA45<currentTEMA40 and
+               currentTEMA40<currentTEMA35 and
+               currentTEMA35<currentTEMA30 and
+               currentTEMA30<currentTEMA25 and
+               currentTEMA25<currentTEMA20):
+                if(previousLow < previousTEMA20 and previousClose > previousTEMA20):
+                    Signals.append("[BUY " + strTimeframe + "]")
             
     # SELL SIGNAL
     if(previousTEMA50 > currentTEMA50 and
@@ -136,8 +146,20 @@ def getSignals(rates_frame,strTimeframe):
        previousTEMA40 > currentTEMA40 and
        previousTEMA35 > currentTEMA35 and
        previousTEMA30 > currentTEMA30 and
-       previousTEMA25 > currentTEMA25):
-        Signals.append("[SELL " + strTimeframe + "]")
+       previousTEMA25 > currentTEMA25 and
+       previousTEMA20 > currentTEMA20):
+        if(strTimeframe!="M1"):
+            Signals.append("[SELL " + strTimeframe + "]")
+        else:
+            if(currentTEMA50>currentTEMA45 and
+               currentTEMA45>currentTEMA40 and
+               currentTEMA40>currentTEMA35 and
+               currentTEMA35>currentTEMA30 and
+               currentTEMA30>currentTEMA25 and
+               currentTEMA25>currentTEMA20):
+                if(previousHigh > previousTEMA20 and previousClose < previousTEMA20):
+                    Signals.append("[SELL " + strTimeframe + "]")
+
 
                 
 ##########################################################################################
@@ -189,11 +211,11 @@ while(True):
                         break
             if(len(sameSignals)>0):          
                 display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                winsound.Beep(freq, duration)
+                #winsound.Beep(freq, duration)
                 
         display+="==============================\n"
     print(display)
-    time.sleep(60)
+    time.sleep(5)
     os.system('cls' if os.name == 'nt' else 'clear')
     
 ##########################################################################################
