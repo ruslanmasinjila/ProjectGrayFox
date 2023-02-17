@@ -82,19 +82,25 @@ Signals        = []
 def getSignals(rates_frame,strTimeframe):
     
     
+    ichimokuValues            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"])
     currentOpen               = rates_frame["open"].iloc[-1]
     currentClose              = rates_frame["close"].iloc[-1]
     currentHigh               = rates_frame["high"].iloc[-1]
     currentLow                = rates_frame["low"].iloc[-1]
-    currentIsGreen            = currentClose > currentOpen
-    currentIsRed              = currentClose < currentOpen
+    currentIsGreen            = (currentClose > currentOpen)
+    currentIsRed              = (currentClose < currentOpen)
+    currentSenkouSpanA        =  ichimokuValues[0]["ISA_9"].iloc[-1]      
+    currentSenkouSpanB        =  ichimokuValues[0]["ISB_26"].iloc[-1]
     
     previousOpen              = rates_frame["open"].iloc[-2]
     previousClose             = rates_frame["close"].iloc[-2]
     previousHigh              = rates_frame["high"].iloc[-2]
     previousLow               = rates_frame["low"].iloc[-2]
-    previousIsGreen           = previousClose > previousOpen
-    previousIsRed             = previousClose < previousOpen
+    previousIsGreen           = (previousClose > previousOpen)
+    previousIsRed             = (previousClose < previousOpen)
+    currentSenkouSpanA        =  ichimokuValues[0]["ISA_9"].iloc[-1]      
+    currentSenkouSpanB        =  ichimokuValues[0]["ISB_26"].iloc[-1]
+    
     
     # BUY SIGNAL
     if(currentLow  > previousLow and currentHigh > previousHigh):
