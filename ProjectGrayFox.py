@@ -127,13 +127,11 @@ def getSignals(rates_frame,strTimeframe):
        previousTEMA30 < currentTEMA30 and
        previousTEMA25 < currentTEMA25 and
        previousTEMA20 < currentTEMA20):
-        if(strTimeframe!="M1"):
-            if(currentIsGreen):
-                Signals.append("[BUY " + strTimeframe + "]")
-        else:
-            if(currentIsGreen):
+        if(currentIsGreen):
+            if(currentLow > previousLow):
                 if(currentClose > previousHigh):
                     Signals.append("[BUY " + strTimeframe + "]")
+
 
             
     # SELL SIGNAL
@@ -144,12 +142,11 @@ def getSignals(rates_frame,strTimeframe):
        previousTEMA30 > currentTEMA30 and
        previousTEMA25 > currentTEMA25 and
        previousTEMA20 > currentTEMA20):
-        if(strTimeframe!="M1"):
-            Signals.append("[SELL " + strTimeframe + "]")
-        else:
-            if(currentIsRed):
+        if(currentIsRed):
+            if(currentHigh < previousHigh):
                 if(currentClose < previousLow):
                     Signals.append("[SELL " + strTimeframe + "]")
+
                     
 ##########################################################################################
 
@@ -183,9 +180,9 @@ while(True):
         for t in range(len(mt5Timeframe)):
             
             offset      = 0
-            
             if(strTimeframe[t]=="M1"):
                 offset = 1
+                
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
