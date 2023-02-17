@@ -70,6 +70,7 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
 numCandles     = 200
+offset         = 1
 Signals        = []
 
 ##########################################################################################
@@ -81,7 +82,6 @@ Signals        = []
 def getSignals(rates_frame,strTimeframe):
     
     
-    ichimokuValues            =  ta.ichimoku(rates_frame["high"], rates_frame["low"], rates_frame["close"])
     currentOpen               = rates_frame["open"].iloc[-1]
     currentClose              = rates_frame["close"].iloc[-1]
     currentHigh               = rates_frame["high"].iloc[-1]
@@ -98,15 +98,17 @@ def getSignals(rates_frame,strTimeframe):
  
     
     # BUY SIGNAL
-    if(currentLow  > previousLow and currentHigh > previousHigh):
-        if(currentClose > previousHigh):
-            Signals.append("[BUY " + strTimeframe + "]")
+    if(previousIsGreen and currentIsGreen):
+        if(currentLow  > previousLow and currentHigh > previousHigh):
+            if(currentClose > previousClose):
+                Signals.append("[BUY " + strTimeframe + "]")
                 
 
     # SELL SIGNAL
-    if(currentLow < previousLow and currentHigh < previousHigh):
-        if(currentClose < previousLow):
-            Signals.append("[SELL " + strTimeframe + "]")
+    if(previousIsRed and currentIsRed):
+        if(currentLow < previousLow and currentHigh < previousHigh):
+            if(currentClose < previousClose):
+                Signals.append("[SELL " + strTimeframe + "]")
                 
 
                     
@@ -117,7 +119,7 @@ def getSignals(rates_frame,strTimeframe):
 
 
 # Gets the most recent <numCandles> prices for a specified <currency_pair> and <mt5Timeframe>
-def getRates(currency_pair, mt5Timeframe,offset, numCandles):
+def getRates(currency_pair, mt5Timeframe, numCandles):
     rates_frame =  mt5.copy_rates_from_pos(currency_pair, mt5Timeframe, offset, numCandles)
     rates_frame = pd.DataFrame(rates_frame)
     return rates_frame
@@ -140,11 +142,7 @@ while(True):
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
-            
-            offset = 0
-            if(strTimeframe[t] == "M1"):
-                offset = 1
-            rates_frame = getRates(cp, mt5Timeframe[t],offset,numCandles)
+            rates_frame = getRates(cp, mt5Timeframe[t],numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
         sameSignals = []
