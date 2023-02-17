@@ -70,7 +70,6 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
 numCandles     = 1000
-offset         = 0
 
 Signals   = []
 
@@ -182,7 +181,7 @@ def getSignals(rates_frame,strTimeframe):
 
 
 # Gets the most recent <numCandles> prices for a specified <currency_pair> and <mt5Timeframe>
-def getRates(currency_pair, mt5Timeframe, numCandles):
+def getRates(currency_pair, mt5Timeframe, offset, numCandles):
     rates_frame =  mt5.copy_rates_from_pos(currency_pair, mt5Timeframe, offset, numCandles)
     rates_frame = pd.DataFrame(rates_frame)
     return rates_frame
@@ -205,7 +204,10 @@ while(True):
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
-            rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
+            offset = 0
+            if(strTimeframe[t] == "M1"):
+                offset = 1
+            rates_frame = getRates(cp, mt5Timeframe[t], offset, numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
         sameSignals = []
