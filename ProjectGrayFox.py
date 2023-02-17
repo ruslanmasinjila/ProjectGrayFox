@@ -69,7 +69,7 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1,W1,MN1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
-numCandles     = 100
+numCandles     = 5
 
 Signals        = []
 
@@ -120,32 +120,18 @@ def getSignals(rates_frame,strTimeframe):
     previousIsRed             = previousClose < previousOpen
     
     # BUY SIGNAL
-    if(previousTEMA50 < currentTEMA50 and 
-       previousTEMA45 < currentTEMA45 and
-       previousTEMA40 < currentTEMA40 and
-       previousTEMA35 < currentTEMA35 and
-       previousTEMA30 < currentTEMA30 and
-       previousTEMA25 < currentTEMA25 and
-       previousTEMA20 < currentTEMA20):
-        if(currentIsGreen):
-            if(currentLow > previousLow):
-                if(currentClose > previousHigh):
-                    Signals.append("[BUY " + strTimeframe + "]")
+    if(currentIsGreen):
+        if(currentLow > previousLow):
+            if(currentHigh > previousHigh):
+                Signals.append("[BUY " + strTimeframe + "]")
 
 
             
     # SELL SIGNAL
-    if(previousTEMA50 > currentTEMA50 and
-       previousTEMA45 > currentTEMA45 and
-       previousTEMA40 > currentTEMA40 and
-       previousTEMA35 > currentTEMA35 and
-       previousTEMA30 > currentTEMA30 and
-       previousTEMA25 > currentTEMA25 and
-       previousTEMA20 > currentTEMA20):
-        if(currentIsRed):
+    if(currentIsRed):
+        if(currentLow < previousLow):
             if(currentHigh < previousHigh):
-                if(currentClose < previousLow):
-                    Signals.append("[SELL " + strTimeframe + "]")
+                Signals.append("[SELL " + strTimeframe + "]")
 
                     
 ##########################################################################################
