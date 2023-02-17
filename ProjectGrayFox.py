@@ -69,8 +69,8 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1,W1,MN1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
-numCandles     = 5
-
+numCandles     = 200
+offset         = 1
 Signals        = []
 
 ##########################################################################################
@@ -81,21 +81,6 @@ Signals        = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    rates_frame["tema50"] = ta.tema(rates_frame["close"],length=50)
-    rates_frame["tema45"] = ta.tema(rates_frame["close"],length=45)
-    rates_frame["tema40"] = ta.tema(rates_frame["close"],length=40)
-    rates_frame["tema35"] = ta.tema(rates_frame["close"],length=35)
-    rates_frame["tema30"] = ta.tema(rates_frame["close"],length=30)
-    rates_frame["tema25"] = ta.tema(rates_frame["close"],length=25)
-    rates_frame["tema20"] = ta.tema(rates_frame["close"],length=20)
-    
-    currentTEMA50             = rates_frame["tema50"].iloc[-1]
-    currentTEMA45             = rates_frame["tema45"].iloc[-1]
-    currentTEMA40             = rates_frame["tema40"].iloc[-1]
-    currentTEMA35             = rates_frame["tema35"].iloc[-1]
-    currentTEMA30             = rates_frame["tema30"].iloc[-1]
-    currentTEMA25             = rates_frame["tema25"].iloc[-1]
-    currentTEMA20             = rates_frame["tema20"].iloc[-1]
     
     currentOpen               = rates_frame["open"].iloc[-1]
     currentClose              = rates_frame["close"].iloc[-1]
@@ -103,14 +88,6 @@ def getSignals(rates_frame,strTimeframe):
     currentLow                = rates_frame["low"].iloc[-1]
     currentIsGreen            = currentClose > currentOpen
     currentIsRed              = currentClose < currentOpen
-    
-    previousTEMA50            = rates_frame["tema50"].iloc[-2]
-    previousTEMA45            = rates_frame["tema45"].iloc[-2]
-    previousTEMA40            = rates_frame["tema40"].iloc[-2]
-    previousTEMA35            = rates_frame["tema35"].iloc[-2]
-    previousTEMA30            = rates_frame["tema30"].iloc[-2]
-    previousTEMA25            = rates_frame["tema25"].iloc[-2]
-    previousTEMA20            = rates_frame["tema20"].iloc[-2]
     
     previousOpen              = rates_frame["open"].iloc[-2]
     previousClose             = rates_frame["close"].iloc[-2]
@@ -120,17 +97,15 @@ def getSignals(rates_frame,strTimeframe):
     previousIsRed             = previousClose < previousOpen
     
     # BUY SIGNAL
-    if(currentIsGreen):
-        if(currentLow > previousLow):
-            if(currentHigh > previousHigh):
-                Signals.append("[BUY " + strTimeframe + "]")
+    if(currentLow  > previousLow and currentHigh > previousHigh):
+        if(currentClose > previousHigh):
+            Signals.append("[BUY " + strTimeframe + "]")
 
             
     # SELL SIGNAL
-    if(currentIsRed):
-        if(currentHigh < previousHigh):
-            if(currentLow < previousLow):
-                Signals.append("[SELL " + strTimeframe + "]")
+    if(currentLow < previousLow and currentHigh < previousHigh):
+        if(currentClose < previousLow):
+            Signals.append("[SELL " + strTimeframe + "]")
 
                     
 ##########################################################################################
@@ -140,7 +115,7 @@ def getSignals(rates_frame,strTimeframe):
 
 
 # Gets the most recent <numCandles> prices for a specified <currency_pair> and <mt5Timeframe>
-def getRates(currency_pair, mt5Timeframe, offset, numCandles):
+def getRates(currency_pair, mt5Timeframe, numCandles):
     rates_frame =  mt5.copy_rates_from_pos(currency_pair, mt5Timeframe, offset, numCandles)
     rates_frame = pd.DataFrame(rates_frame)
     return rates_frame
@@ -163,11 +138,8 @@ while(True):
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
-            offset         = 0
-            if(strTimeframe[t] == "M1"):
-                offset = 1
-                
-            rates_frame = getRates(cp, mt5Timeframe[t], offset, numCandles)
+            
+            rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
         sameSignals = []
