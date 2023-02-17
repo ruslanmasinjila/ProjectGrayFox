@@ -18,8 +18,7 @@ import os
 
 import winsound
 duration  = 50
-freq1     = 2000
-freq2     = 1000
+freq      = 1500
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -71,7 +70,6 @@ mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
 numCandles     = 200
-offset         = 1
 Signals        = []
 
 ##########################################################################################
@@ -90,8 +88,6 @@ def getSignals(rates_frame,strTimeframe):
     currentLow                = rates_frame["low"].iloc[-1]
     currentIsGreen            = (currentClose > currentOpen)
     currentIsRed              = (currentClose < currentOpen)
-    currentSenkouSpanA        =  ichimokuValues[0]["ISA_9"].iloc[-1]      
-    currentSenkouSpanB        =  ichimokuValues[0]["ISB_26"].iloc[-1]
     
     previousOpen              = rates_frame["open"].iloc[-2]
     previousClose             = rates_frame["close"].iloc[-2]
@@ -99,32 +95,18 @@ def getSignals(rates_frame,strTimeframe):
     previousLow               = rates_frame["low"].iloc[-2]
     previousIsGreen           = (previousClose > previousOpen)
     previousIsRed             = (previousClose < previousOpen)
-    previousSenkouSpanA       =  ichimokuValues[0]["ISA_9"].iloc[-2]      
-    previousSenkouSpanB       =  ichimokuValues[0]["ISB_26"].iloc[-2]
  
     
     # BUY SIGNAL
     if(currentLow  > previousLow and currentHigh > previousHigh):
         if(currentClose > previousHigh):
-            if(((currentOpen  < currentSenkouSpanA  or currentOpen  < currentSenkouSpanB)  and (currentClose  > currentSenkouSpanA  and currentClose  > currentSenkouSpanB)) or
-               ((previousOpen < previousSenkouSpanA or previousOpen < previousSenkouSpanB) and (previousClose > previousSenkouSpanA and previousClose > previousSenkouSpanB))):
-                Signals.append("[BUY " + strTimeframe + " NOW]")
-            elif(currentLow > currentSenkouSpanA and currentLow > currentSenkouSpanB):
-                Signals.append("[BUY " + strTimeframe + "]")
-            else:
-                Signals.append("==")
+            Signals.append("[BUY " + strTimeframe + "]")
                 
 
     # SELL SIGNAL
     if(currentLow < previousLow and currentHigh < previousHigh):
         if(currentClose < previousLow):
-            if(((currentOpen  > currentSenkouSpanA  or currentOpen  > currentSenkouSpanB)  and (currentClose  < currentSenkouSpanA  and currentClose  < currentSenkouSpanB)) or
-               ((previousOpen > previousSenkouSpanA or previousOpen > previousSenkouSpanB) and (previousClose < previousSenkouSpanA and previousClose < previousSenkouSpanB))):
-                Signals.append("[SELL " + strTimeframe + " NOW]")
-            elif(currentHigh < currentSenkouSpanA and currentHigh < currentSenkouSpanB):
-                Signals.append("[SELL " + strTimeframe + "]")
-            else:
-                Signals.append("==")
+            Signals.append("[SELL " + strTimeframe + "]")
                 
 
                     
@@ -135,7 +117,7 @@ def getSignals(rates_frame,strTimeframe):
 
 
 # Gets the most recent <numCandles> prices for a specified <currency_pair> and <mt5Timeframe>
-def getRates(currency_pair, mt5Timeframe, numCandles):
+def getRates(currency_pair, mt5Timeframe,offset, numCandles):
     rates_frame =  mt5.copy_rates_from_pos(currency_pair, mt5Timeframe, offset, numCandles)
     rates_frame = pd.DataFrame(rates_frame)
     return rates_frame
@@ -158,30 +140,30 @@ while(True):
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
-            rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
+            
+            offset = 0
+            if(strTimeframe[t] == "M1"):
+                offset = 1
+            rates_frame = getRates(cp, mt5Timeframe[t],offset,numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
         sameSignals = []
         if(len(Signals)>0): 
-            if("BUY" in Signals[0]):
+            if(Signals[0]=="[BUY M1]"):
                 for i in Signals:
                     if("BUY" in i):
                         sameSignals.append(i)
                     else:
                         break
-            elif("SELL" in Signals[0]):
+            elif(Signals[0]=="[SELL M1]"):
                 for i in Signals:
                     if("SELL" in i):
                         sameSignals.append(i)
                     else:
                         break
             if(len(sameSignals)>0):
-                if(sameSignals[0]=="[BUY M1 NOW]" or sameSignals[0]=="[SELL M1 NOW]"):
-                    display+="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                    winsound.Beep(freq1, duration)
-                elif(sameSignals[0]=="[BUY M1]" or sameSignals[0]=="[SELL M1]"):
-                    display+="**************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                    winsound.Beep(freq2, duration)
+                display+="**************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+                winsound.Beep(freq, duration)
 
         display+="==============================\n"
     print(display)
