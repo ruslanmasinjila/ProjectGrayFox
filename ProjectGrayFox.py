@@ -121,22 +121,22 @@ def getSignals(rates_frame,strTimeframe):
     previousIsRed             = previousClose < previousOpen
     
     # BUY SIGNAL
-    if(previousTEMA50<previousTEMA45 and currentTEMA50<currentTEMA45 and 
-       previousTEMA45<previousTEMA40 and currentTEMA45<currentTEMA40 and
-       previousTEMA40<previousTEMA35 and currentTEMA40<currentTEMA35 and
-       previousTEMA35<previousTEMA30 and currentTEMA35<currentTEMA30 and
-       previousTEMA30<previousTEMA25 and currentTEMA30<currentTEMA25 and
-       previousTEMA25<previousTEMA20 and currentTEMA25<currentTEMA20):
-        Signals.append("[BUY | " +strTimeframe+"]")
+    if(previousTEMA50 < currentTEMA50 and 
+       previousTEMA45 < currentTEMA45 and
+       previousTEMA40 < currentTEMA40 and
+       previousTEMA35 < currentTEMA35 and
+       previousTEMA30 < currentTEMA30 and
+       previousTEMA25 < currentTEMA25):
+        Signals.append("[BUY " + strTimeframe + "]")
             
     # SELL SIGNAL
-    if(previousTEMA50>previousTEMA45 and currentTEMA50>currentTEMA45 and
-       previousTEMA45>previousTEMA40 and currentTEMA45>currentTEMA40 and
-       previousTEMA40>previousTEMA35 and currentTEMA40>currentTEMA35 and
-       previousTEMA35>previousTEMA30 and currentTEMA35>currentTEMA30 and
-       previousTEMA30>previousTEMA25 and currentTEMA30>currentTEMA25 and
-       previousTEMA25>previousTEMA20 and currentTEMA25>currentTEMA20):
-        Signals.append("[SELL | " +strTimeframe+"]")
+    if(previousTEMA50 > currentTEMA50 and
+       previousTEMA45 > currentTEMA45 and
+       previousTEMA40 > currentTEMA40 and
+       previousTEMA35 > currentTEMA35 and
+       previousTEMA30 > currentTEMA30 and
+       previousTEMA25 > currentTEMA25):
+        Signals.append("[SELL " + strTimeframe + "]")
                 
 ##########################################################################################
 
@@ -164,7 +164,7 @@ while(True):
     
     display = banner
     for cp in currency_pairs:
-        
+        display+="["+cp+"]"+"\n"
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
@@ -186,9 +186,10 @@ while(True):
                     else:
                         break
             if(len(sameSignals)>0):           
-                display+="["+cp+"]: "+ "***** "+" ".join(sameSignals)+"\n"
-                winsound.Beep(freq, duration)
+                display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
+                #winsound.Beep(freq, duration)
                 
+        display+="==============================\n"
     print(display)
     time.sleep(5)
     os.system('cls' if os.name == 'nt' else 'clear')
