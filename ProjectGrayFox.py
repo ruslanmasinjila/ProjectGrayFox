@@ -122,15 +122,13 @@ def getSignals(rates_frame,strTimeframe):
     # BUY SIGNAL
     if(currentIsGreen):
         if(currentLow > previousLow):
-            if(currentClose > previousHigh):
+            if(currentHigh > previousHigh):
                 Signals.append("[BUY " + strTimeframe + "]")
-
-
             
     # SELL SIGNAL
     if(currentIsRed):
         if(currentHigh < previousHigh):
-            if(currentClose < previousLow):
+            if(currentLow < previousLow):
                 Signals.append("[SELL " + strTimeframe + "]")
 
                     
