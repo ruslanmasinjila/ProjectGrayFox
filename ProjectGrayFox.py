@@ -124,6 +124,7 @@ def getSignals(rates_frame,strTimeframe):
         if(currentLow > previousLow):
             if(currentHigh > previousHigh):
                 Signals.append("[BUY " + strTimeframe + "]")
+
             
     # SELL SIGNAL
     if(currentIsRed):
