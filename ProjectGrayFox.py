@@ -69,7 +69,7 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1,W1,MN1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
-numCandles     = 6
+numCandles     = 1000
 offset         = 1
 
 Signals   = []
@@ -82,67 +82,62 @@ Signals   = []
 
 def getSignals(rates_frame,strTimeframe):
     
-    firstOpen                =      rates_frame["open"].iloc[-1]
-    firstHigh                =      rates_frame["high"].iloc[-1]
-    firstLow                 =      rates_frame["low"].iloc[-1]
-    firstClose               =      rates_frame["close"].iloc[-1]
-    firstSize                =      abs(firstClose - firstOpen)
-    firstIsGreen             =      (firstClose > firstOpen)
-    firstIsRed               =      (firstClose < firstOpen)
+    rates_frame["tema50"] = ta.tema(rates_frame["close"],length=50)
+    rates_frame["tema45"] = ta.tema(rates_frame["close"],length=45)
+    rates_frame["tema40"] = ta.tema(rates_frame["close"],length=40)
+    rates_frame["tema35"] = ta.tema(rates_frame["close"],length=35)
+    rates_frame["tema30"] = ta.tema(rates_frame["close"],length=30)
+    rates_frame["tema25"] = ta.tema(rates_frame["close"],length=25)
+    rates_frame["tema20"] = ta.tema(rates_frame["close"],length=20)
     
-    secondOpen               =      rates_frame["open"].iloc[-2]
-    secondHigh               =      rates_frame["high"].iloc[-2]
-    secondLow                =      rates_frame["low"].iloc[-2]
-    secondClose              =      rates_frame["close"].iloc[-2]
-    secondSize               =      abs(secondClose - secondOpen)
-    secondIsGreen            =      (secondClose > secondOpen)
-    secondIsRed              =      (secondClose < secondOpen)
+    currentTEMA50             = rates_frame["tema50"].iloc[-1]
+    currentTEMA45             = rates_frame["tema45"].iloc[-1]
+    currentTEMA40             = rates_frame["tema40"].iloc[-1]
+    currentTEMA35             = rates_frame["tema35"].iloc[-1]
+    currentTEMA30             = rates_frame["tema30"].iloc[-1]
+    currentTEMA25             = rates_frame["tema25"].iloc[-1]
+    currentTEMA20             = rates_frame["tema20"].iloc[-1]
     
-    thirdOpen                =      rates_frame["open"].iloc[-3]
-    thirdHigh                =      rates_frame["high"].iloc[-3]
-    thirdLow                 =      rates_frame["low"].iloc[-3]
-    thirdClose               =      rates_frame["close"].iloc[-3]
-    thirdSize                =      abs(thirdClose - thirdOpen)
-    thirdIsGreen             =      (thirdClose > thirdOpen)
-    thirdIsRed               =      (thirdClose < thirdOpen)
+    currentOpen               = rates_frame["open"].iloc[-1]
+    currentClose              = rates_frame["close"].iloc[-1]
+    currentHigh               = rates_frame["high"].iloc[-1]
+    currentLow                = rates_frame["low"].iloc[-1]
+    currentIsGreen            = currentClose > currentOpen
+    currentIsRed              = currentClose < currentOpen
     
-    fourthOpen               =      rates_frame["open"].iloc[-4]
-    fourthHigh               =      rates_frame["high"].iloc[-4]
-    fourthLow                =      rates_frame["low"].iloc[-4]
-    fourthClose              =      rates_frame["close"].iloc[-4]
-    fourthSize               =      abs(fourthClose - fourthOpen)
-    fourthIsGreen            =      (fourthClose > fourthOpen)
-    fourthIsRed              =      (fourthClose < fourthOpen)
+    previousTEMA50            = rates_frame["tema50"].iloc[-2]
+    previousTEMA45            = rates_frame["tema45"].iloc[-2]
+    previousTEMA40            = rates_frame["tema40"].iloc[-2]
+    previousTEMA35            = rates_frame["tema35"].iloc[-2]
+    previousTEMA30            = rates_frame["tema30"].iloc[-2]
+    previousTEMA25            = rates_frame["tema25"].iloc[-2]
+    previousTEMA20            = rates_frame["tema20"].iloc[-2]
     
-    fifthOpen                =      rates_frame["open"].iloc[-5]
-    fifthHigh                =      rates_frame["high"].iloc[-5]
-    fifthLow                 =      rates_frame["low"].iloc[-5]
-    fifthClose               =      rates_frame["close"].iloc[-5]
-    fifthSize                =      abs(fifthClose - fifthOpen)
-    fifthIsGreen             =      (fifthClose  > fifthOpen)
-    fifthIsRed               =      (fifthClose < fifthOpen)
+    previousOpen              = rates_frame["open"].iloc[-2]
+    previousClose             = rates_frame["close"].iloc[-2]
+    previousHigh              = rates_frame["high"].iloc[-2]
+    previousLow               = rates_frame["low"].iloc[-2]
+    previousIsGreen           = previousClose > previousOpen
+    previousIsRed             = previousClose < previousOpen
     
-    
-    #####################################################################################################
     # BUY SIGNAL
-    #####################################################################################################
-    
-    if(thirdIsRed):
-        if(fourthIsGreen and secondIsGreen):
-            if(thirdLow < firstLow and thirdLow < secondLow):
-                if(thirdLow < fourthLow and thirdLow < fifthLow):
-                    Signals.append("[BUY " + strTimeframe + "]")
-
-    #####################################################################################################
+    if(previousTEMA50<previousTEMA45 and currentTEMA50<currentTEMA45 and 
+       previousTEMA45<previousTEMA40 and currentTEMA45<currentTEMA40 and
+       previousTEMA40<previousTEMA35 and currentTEMA40<currentTEMA35 and
+       previousTEMA35<previousTEMA30 and currentTEMA35<currentTEMA30 and
+       previousTEMA30<previousTEMA25 and currentTEMA30<currentTEMA25 and
+       previousTEMA25<previousTEMA20 and currentTEMA25<currentTEMA20):
+        Signals.append("[BUY | " +strTimeframe+"]")
+            
     # SELL SIGNAL
-    #####################################################################################################
-
-    if(thirdIsGreen):
-        if(fourthIsRed and secondIsRed):
-            if(thirdHigh > firstHigh and thirdHigh > secondHigh):
-                if(thirdHigh > fourthHigh and thirdHigh > fifthHigh):
-                    Signals.append("[SELL " + strTimeframe + "]")
-    
+    if(previousTEMA50>previousTEMA45 and currentTEMA50>currentTEMA45 and
+       previousTEMA45>previousTEMA40 and currentTEMA45>currentTEMA40 and
+       previousTEMA40>previousTEMA35 and currentTEMA40>currentTEMA35 and
+       previousTEMA35>previousTEMA30 and currentTEMA35>currentTEMA30 and
+       previousTEMA30>previousTEMA25 and currentTEMA30>currentTEMA25 and
+       previousTEMA25>previousTEMA20 and currentTEMA25>currentTEMA20):
+        Signals.append("[SELL | " +strTimeframe+"]")
+                
 ##########################################################################################
 
 
@@ -169,17 +164,33 @@ while(True):
     
     display = banner
     for cp in currency_pairs:
+        
         Signals =[]
         
         for t in range(len(mt5Timeframe)):
             rates_frame = getRates(cp, mt5Timeframe[t], numCandles)
             getSignals(rates_frame,strTimeframe[t])
             
-        if(len(Signals)>0):
-            display+="["+cp+"]: "+ "******** "+" ".join(Signals)+"\n"
-            winsound.Beep(freq, duration) 
+        sameSignals = []
+        if(len(Signals)>0):   
+            if(Signals[0]=="[BUY M1]"):
+                for i in Signals:
+                    if("BUY" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+            elif(Signals[0]=="[SELL M1]"):
+                for i in Signals:
+                    if("SELL" in i):
+                        sameSignals.append(i)
+                    else:
+                        break
+            if(len(sameSignals)>0):           
+                display+="["+cp+"]: "+ "***** "+" ".join(sameSignals)+"\n"
+                winsound.Beep(freq, duration)
+                
     print(display)
-    time.sleep(60)
+    time.sleep(5)
     os.system('cls' if os.name == 'nt' else 'clear')
     
 ##########################################################################################
