@@ -131,14 +131,22 @@ def getSignals(rates_frame,strTimeframe):
         if(strTimeframe!="M1"):
             Signals.append("[BUY " + strTimeframe + "]")
         else:
-            if(currentTEMA50<currentTEMA45 and
-               currentTEMA45<currentTEMA40 and
-               currentTEMA40<currentTEMA35 and
-               currentTEMA35<currentTEMA30 and
-               currentTEMA30<currentTEMA25 and
-               currentTEMA25<currentTEMA20):
-                if(previousLow < previousTEMA20 and previousClose > previousTEMA20):
+            if(previousTEMA50<previousTEMA45 and
+               previousTEMA45<previousTEMA40 and
+               previousTEMA40<previousTEMA35 and
+               previousTEMA35<previousTEMA30 and
+               previousTEMA30<previousTEMA25 and
+               previousTEMA25<previousTEMA20):
+                pass
+            else:     
+                if(currentTEMA50<currentTEMA45 and
+                   currentTEMA45<currentTEMA40 and
+                   currentTEMA40<currentTEMA35 and
+                   currentTEMA35<currentTEMA30 and
+                   currentTEMA30<currentTEMA25 and
+                   currentTEMA25<currentTEMA20):
                     Signals.append("[BUY " + strTimeframe + "]")
+
             
     # SELL SIGNAL
     if(previousTEMA50 > currentTEMA50 and
@@ -151,17 +159,22 @@ def getSignals(rates_frame,strTimeframe):
         if(strTimeframe!="M1"):
             Signals.append("[SELL " + strTimeframe + "]")
         else:
-            if(currentTEMA50>currentTEMA45 and
-               currentTEMA45>currentTEMA40 and
-               currentTEMA40>currentTEMA35 and
-               currentTEMA35>currentTEMA30 and
-               currentTEMA30>currentTEMA25 and
-               currentTEMA25>currentTEMA20):
-                if(previousHigh > previousTEMA20 and previousClose < previousTEMA20):
+            if(previousTEMA50>previousTEMA45 and
+               previousTEMA45>previousTEMA40 and
+               previousTEMA40>previousTEMA35 and
+               previousTEMA35>previousTEMA30 and
+               previousTEMA30>previousTEMA25 and
+               previousTEMA25>previousTEMA20):
+                pass
+            else:     
+                if(currentTEMA50>currentTEMA45 and
+                   currentTEMA45>currentTEMA40 and
+                   currentTEMA40>currentTEMA35 and
+                   currentTEMA35>currentTEMA30 and
+                   currentTEMA30>currentTEMA25 and
+                   currentTEMA25>currentTEMA20):
                     Signals.append("[SELL " + strTimeframe + "]")
-
-
-                
+                    
 ##########################################################################################
 
 
@@ -211,7 +224,7 @@ while(True):
                         break
             if(len(sameSignals)>0):          
                 display+="***************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                #winsound.Beep(freq, duration)
+                winsound.Beep(freq, duration)
                 
         display+="==============================\n"
     print(display)
