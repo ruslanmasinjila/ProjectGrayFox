@@ -18,7 +18,8 @@ import os
 
 import winsound
 duration  = 50
-freq      = 1500
+freq1     = 1500
+freq2     = 2000
 
 # NUMBER OF COLUMNS TO BE DISPLAYED
 pd.set_option('display.max_columns', 500)
@@ -69,9 +70,10 @@ with open('instruments.txt') as f:
 mt5Timeframe   = [M1,M2,M3,M4,M5,M6,M10,M12,M15,M20,M30,H1,H2,H3,H4,H6,H8,H12,D1,W1,MN1]
 strTimeframe   = ["M1","M2","M3","M4","M5","M6","M10","M12","M15","M20","M30","H1","H2","H3","H4","H6","H8","H12","D1","W1","MN1"]
 
-numCandles     = 200
-offset         = 1
-Signals        = []
+numCandles     = 2
+offset         = 0
+buySignals     = []
+sellSignals    = []
 
 ##########################################################################################
 
@@ -79,39 +81,27 @@ Signals        = []
 # In[1]:
 
 
-def getSignals(rates_frame,strTimeframe):
+def getbuySignals(rates_frame,strTimeframe):
     
     
     currentOpen               = rates_frame["open"].iloc[-1]
     currentClose              = rates_frame["close"].iloc[-1]
-    currentHigh               = rates_frame["high"].iloc[-1]
-    currentLow                = rates_frame["low"].iloc[-1]
     currentIsGreen            = (currentClose > currentOpen)
     currentIsRed              = (currentClose < currentOpen)
     
-    previousOpen              = rates_frame["open"].iloc[-2]
-    previousClose             = rates_frame["close"].iloc[-2]
-    previousHigh              = rates_frame["high"].iloc[-2]
-    previousLow               = rates_frame["low"].iloc[-2]
-    previousIsGreen           = (previousClose > previousOpen)
-    previousIsRed             = (previousClose < previousOpen)
- 
-    
     # BUY SIGNAL
-    if(previousIsGreen and currentIsGreen):
-        if(currentLow  > previousLow and currentHigh > previousHigh):
-            if(currentClose > previousClose):
-                Signals.append("[BUY " + strTimeframe + "]")
+    if(currentIsGreen):
+        buySignals.append("[BUY " + strTimeframe + "]")
+    else:
+        buySignals.append("X")
                 
 
     # SELL SIGNAL
-    if(previousIsRed and currentIsRed):
-        if(currentLow < previousLow and currentHigh < previousHigh):
-            if(currentClose < previousClose):
-                Signals.append("[SELL " + strTimeframe + "]")
-                
-
-                    
+    if(currentIsRed):
+        sellSignals.append("[SELL " + strTimeframe + "]")
+    else:
+        sellSignals.append("X")
+              
 ##########################################################################################
 
 
@@ -138,32 +128,48 @@ while(True):
     
     display = banner
     for cp in currency_pairs:
-        display+="["+cp+"]"+"\n"
-        Signals =[]
+
+        buySignals     = []
+        sellSignals    = []
         
         for t in range(len(mt5Timeframe)):
             rates_frame = getRates(cp, mt5Timeframe[t],numCandles)
-            getSignals(rates_frame,strTimeframe[t])
+            getbuySignals(rates_frame,strTimeframe[t])
             
-        sameSignals = []
-        if(len(Signals)>0): 
-            if(Signals[0]=="[BUY M1]"):
-                for i in Signals:
+        consecutiveBuySignals = []
+        if(len(buySignals)>0): 
+            if(buySignals[0]=="[BUY M1]"):
+                for i in buySignals:
                     if("BUY" in i):
-                        sameSignals.append(i)
+                        consecutiveBuySignals.append(i)
                     else:
                         break
-            elif(Signals[0]=="[SELL M1]"):
-                for i in Signals:
+        consecutiveSellSignals = []
+        if(len(sellSignals)>0):
+            if(sellSignals[0]=="[SELL M1]"):
+                for i in sellSignals:
                     if("SELL" in i):
-                        sameSignals.append(i)
+                        consecutiveSellSignals.append(i)
                     else:
                         break
-            if(len(sameSignals)>0):
-                display+="**************************************************  "+ str(len(sameSignals))+"\n"+" ".join(sameSignals)+"\n"
-                winsound.Beep(freq, duration)
-
-        display+="==============================\n"
+                        
+        if(len(consecutiveBuySignals)>0):
+            if(len(consecutiveBuySignals)<=18):
+                display+="["+cp+"]: "+"********************  "+"[" + '{:02d}'.format(len(consecutiveBuySignals))  + "]" + " " + consecutiveBuySignals[-1] + "\n"
+                winsound.Beep(freq1, duration)
+            else:
+                display+="["+cp+"]: "+"XXXXXXXXXXXXXXXXXXXX  "+"[" + '{:02d}'.format(len(consecutiveBuySignals))  + "]" + " " + consecutiveBuySignals[-1] + "\n"
+                winsound.Beep(freq2, duration)
+                
+            
+        if(len(consecutiveSellSignals)>0):
+            if(len(consecutiveSellSignals)<=18):
+                display+="["+cp+"]: "+"********************  "+"[" + '{:02d}'.format(len(consecutiveSellSignals)) + "]" + " " + consecutiveSellSignals[-1] + "\n"
+                winsound.Beep(freq1, duration)
+            else:
+                display+="["+cp+"]: "+"XXXXXXXXXXXXXXXXXXXX  "+"[" + '{:02d}'.format(len(consecutiveSellSignals)) + "]" + " " + consecutiveSellSignals[-1] + "\n"
+                winsound.Beep(freq2, duration)
+            
     print(display)
     time.sleep(5)
     os.system('cls' if os.name == 'nt' else 'clear')
